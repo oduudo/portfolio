@@ -3,6 +3,7 @@ package name.abuchen.portfolio.ui.views;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -202,6 +203,7 @@ public final class SecuritiesTable implements ModificationListener
         addAttributeColumns();
         addQuoteFeedColumns();
         addDataQualityColumns();
+        addPARColumn();
 
         support.createColumns();
 
@@ -547,7 +549,63 @@ public final class SecuritiesTable implements ModificationListener
         }));
         support.addColumn(column);
     }
+    
+    private void addPARColumn() // NOSONAR
+    {
+        // create a modifiable copy as all menus share the same list of
+        // reporting periods
+        List<ReportingPeriod> options = new ArrayList<>(view.getPart().getReportingPeriods());
 
+        BiFunction<Object, ReportingPeriod, Double> valueProvider = (element, option) -> {
+            
+            Interval interval = option.toInterval(LocalDate.now());
+            
+            Security security = (Security) element;
+
+            SecurityPrice latest = security.getSecurityPrice(interval.getEnd());
+            SecurityPrice previous = security.getSecurityPrice(interval.getStart());
+
+            if (latest == null || previous == null)
+                return null;
+
+            if (previous.getValue() == 0)
+                return null;
+
+            if (previous.getDate().isAfter(interval.getStart()))
+                return null;
+            
+            double t = ChronoUnit.DAYS.between(interval.getStart(), interval.getEnd()) / 365.2425;
+            double x = (double) latest.getValue() / (double) previous.getValue();
+            double par = Math.pow(x, 1/t) - 1;
+            
+            //return Double.valueOf(t);
+            return Double.valueOf(par);
+            
+        };
+
+        Column column = new Column("par-period", Messages.ColumnPAR, SWT.RIGHT, 80); //$NON-NLS-1$
+        column.setOptions(new ReportingPeriodColumnOptions(Messages.ColumnPAR_Option, options));
+        column.setDescription(Messages.ColumnPAR_Description);
+        column.setLabelProvider(new PARLabelProvider(valueProvider));
+        column.setVisible(false);
+        column.setSorter(ColumnViewerSorter.create((o1, o2) -> {
+            ReportingPeriod option = (ReportingPeriod) ColumnViewerSorter.SortingContext.getColumnOption();
+
+            Double v1 = valueProvider.apply(o1, option);
+            Double v2 = valueProvider.apply(o2, option);
+
+            if (v1 == null && v2 == null)
+                return 0;
+            else if (v1 == null)
+                return -1;
+            else if (v2 == null)
+                return 1;
+
+            return Double.compare(v1.doubleValue(), v2.doubleValue());
+        }));
+        support.addColumn(column);
+    }
+    
     private void addAttributeColumns()
     {
         AttributeColumn.createFor(getClient(), Security.class) //
@@ -1122,4 +1180,40 @@ public final class SecuritiesTable implements ModificationListener
             return null;
         }
     }
+    
+    private static final class PARLabelProvider extends OptionLabelProvider<ReportingPeriod>
+    {
+        private BiFunction<Object, ReportingPeriod, Double> valueProvider;
+
+        public PARLabelProvider(BiFunction<Object, ReportingPeriod, Double> valueProvider)
+        {
+            this.valueProvider = valueProvider;
+        }
+
+        @Override
+        public String getText(Object e, ReportingPeriod option)
+        {
+            Double value = valueProvider.apply(e, option);
+            if (value == null)
+                return null;
+
+            return String.format("%,.1f", value * 100); //$NON-NLS-1$
+        }
+
+        @Override
+        public Color getForeground(Object e, ReportingPeriod option)
+        {
+            Double value = valueProvider.apply(e, option);
+            if (value == null)
+                return null;
+
+            if (value.doubleValue() < 0)
+                return Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED);
+            else if (value.doubleValue() > 0)
+                return Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
+            else
+                return null;
+        }
+    }
+    
 }
