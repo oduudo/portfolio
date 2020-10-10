@@ -1208,9 +1208,9 @@ public final class SecuritiesTable implements ModificationListener
                 return null;
 
             if (value.doubleValue() < 0)
-                return Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED);
+                return Colors.theme().redForeground();
             else if (value.doubleValue() > 0)
-                return Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
+                return Colors.theme().greenForeground();
             else
                 return null;
         }
