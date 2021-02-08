@@ -41,8 +41,8 @@ public class ComdirectPDFExtractor extends AbstractPDFExtractor
         addVorabsteuerTransaction();
         addDividendTransactionFromSteuermitteilungPDF();
         addFeesFromVerwahrentgeltPDF();
-        addInterestOnSecuritiesTransaction();
-        addTaxNotificationOnInterestTransaction();
+        addInteresWithoutTaxOnSecuritiesTransaction();
+        addInteresWithTaxOnSecuritiesTransaction();
     }
 
     @SuppressWarnings("nls")
@@ -690,7 +690,7 @@ public class ComdirectPDFExtractor extends AbstractPDFExtractor
     }
 
     @SuppressWarnings("nls")
-    private void addInterestOnSecuritiesTransaction()
+    private void addInteresWithoutTaxOnSecuritiesTransaction()
     {
         DocumentType type = new DocumentType("Abrechnung Zinsgutschrift");
         this.addDocumentTyp(type);
@@ -721,7 +721,7 @@ public class ComdirectPDFExtractor extends AbstractPDFExtractor
                 v.put("isin", stripBlanks(v.get("isin")));
                 v.put("wkn", stripBlanks(v.get("wkn")));
                 v.put("name", stripBlanks(v.get("name")));
-                t.setNote(v.get("text"));
+                t.setNote(v.get("text") + " " + v.get("name"));
                 t.setSecurity(getOrCreateSecurity(v));
                 t.setShares(asShares(stripBlanks(v.get("shares"))));
             })
@@ -739,7 +739,7 @@ public class ComdirectPDFExtractor extends AbstractPDFExtractor
     }
 
     @SuppressWarnings("nls")
-    private void addTaxNotificationOnInterestTransaction()
+    private void addInteresWithTaxOnSecuritiesTransaction()
     {
         DocumentType type = new DocumentType("Steuerliche Behandlung: Zinsen vom .*");
 
@@ -751,7 +751,7 @@ public class ComdirectPDFExtractor extends AbstractPDFExtractor
 
             .subject(() -> {
                 AccountTransaction t = new AccountTransaction();
-                t.setType(AccountTransaction.Type.TAX_REFUND);
+                t.setType(AccountTransaction.Type.DIVIDENDS);
                 return t;
             })
 
@@ -761,7 +761,7 @@ public class ComdirectPDFExtractor extends AbstractPDFExtractor
             .assign((t, v) -> {
                 v.put("isin", stripBlanks(v.get("isin")));
                 v.put("wkn", stripBlanks(v.get("wkn")));
-                t.setNote(v.get("text") + v.get("name"));
+                t.setNote(v.get("text") + " " + v.get("name"));
                 t.setSecurity(getOrCreateSecurity(v));
                 t.setShares(asShares(stripBlanks(v.get("shares"))));
             })

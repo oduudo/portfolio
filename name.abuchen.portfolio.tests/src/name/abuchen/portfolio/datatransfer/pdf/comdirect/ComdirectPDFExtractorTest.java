@@ -1735,7 +1735,7 @@ public class ComdirectPDFExtractorTest
         AccountTransaction transaction = (AccountTransaction) item.orElseThrow(IllegalArgumentException::new)
                         .getSubject();
 
-        assertThat(transaction.getType(), is(AccountTransaction.Type.TAX_REFUND));
+        assertThat(transaction.getType(), is(AccountTransaction.Type.DIVIDENDS));
         assertThat(transaction.getSecurity(), is(security));
         assertThat(transaction.getAmount(), is(Values.Amount.factorize(72.01)));
         assertThat(transaction.getUnitSum(Unit.Type.TAX).getAmount(), is(Values.Amount.factorize(27.99)));
