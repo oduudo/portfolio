@@ -673,6 +673,11 @@ public class Messages extends NLS
     public static String LabelJSONPathHint;
     public static String LabelJSONPathToClose;
     public static String LabelJSONPathToDate;
+    public static String LabelJSONDateFormat;
+    public static String LabelJSONDateFormatHint;
+    public static String LabelJSONPathToLow;
+    public static String LabelJSONPathToHigh;
+    public static String LabelJSONPathToVolume;
     public static String LabelKeyIndicators;
     public static String LabelMaxDrawdown;
     public static String LabelMaxDrawdownDuration;
@@ -1078,6 +1083,9 @@ public class Messages extends NLS
     public static String HoldingsWarningAssetsWithNegativeValuation;
     public static String HoldingsWarningAssetsWithNegativeValuationDetails;
     public static String YearlyPerformanceHeatmapToolTip;
+    public static String SecurityMenuSetSecurityInactive;
+    public static String SecurityMenuSetMultipleSecurityInactiveConfirm;
+    public static String SecurityMenuSetSingleSecurityInactiveConfirm;
     static
     {
         // initialize resource bundle
