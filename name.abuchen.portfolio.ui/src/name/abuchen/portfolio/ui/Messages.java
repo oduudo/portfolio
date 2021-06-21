@@ -999,6 +999,7 @@ public class Messages extends NLS
     public static String SecurityMenuDeleteSingleSecurityConfirm;
     public static String SecurityMenuDividends;
     public static String SecurityMenuEditSecurity;
+    public static String SecurityMenuEmptyInstrument;
     public static String SecurityMenuErrorMessageRoundingMustBeBetween0AndX;
     public static String SecurityMenuExportCSV;
     public static String SecurityMenuImportCSV;
@@ -1021,6 +1022,7 @@ public class Messages extends NLS
     public static String SecurityMenuSetSingleSecurityInactiveConfirm;
     public static String SecurityMenuStockSplit;
     public static String SecurityMenuAddEvent;
+    public static String SecurityMenuHICPMessage;
     public static String SecurityMenuLabelNumberOfDecimalPlaces;
     public static String SecurityMenuTransfer;
     public static String SecurityMenuUpdateQuotes;
