@@ -1,5 +1,7 @@
 package name.abuchen.portfolio.ui.views.dashboard;
 
+import static name.abuchen.portfolio.util.CollectorsUtil.toMutableList;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -878,7 +880,7 @@ public class DashboardView extends AbstractHistoricView
         Dashboard.Column newColumn = new Dashboard.Column();
         dashboard.getColumns().add(index, newColumn);
 
-        newColumn.setWidgets(column.getWidgets().stream().map(Widget::copy).toList());
+        newColumn.setWidgets(column.getWidgets().stream().map(Widget::copy).collect(toMutableList()));
 
         getClient().touch();
 
