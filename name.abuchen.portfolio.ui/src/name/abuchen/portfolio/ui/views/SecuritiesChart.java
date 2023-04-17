@@ -421,11 +421,11 @@ public class SecuritiesChart
 
         messagePainter.setMessage(Messages.SecuritiesChart_NoDataMessage_NoSecuritySelected);
 
-        setupTooltip();
-
         ILegend legend = chart.getLegend();
         legend.setPosition(SWT.BOTTOM);
         legend.setVisible(true);
+
+        setupTooltip();
     }
 
     public IntervalOption getIntervalOption()
@@ -606,6 +606,8 @@ public class SecuritiesChart
 
     public void addButtons(ToolBarManager toolBar)
     {
+        chart.getMeasurementTool().addButtons(toolBar);
+
         List<Action> viewActions = new ArrayList<>();
 
         for (IntervalOption option : IntervalOption.values())
