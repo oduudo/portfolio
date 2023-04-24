@@ -4,17 +4,18 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Event;
-import org.swtchart.ICustomPaintListener;
-import org.swtchart.IPlotArea;
 
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.ui.Images;
@@ -46,6 +47,7 @@ public class MeasurementTool
     public static final int PADDING = 5;
 
     private final TimelineChart chart;
+    private ArrayList<IAction> buttons = new ArrayList<>();
 
     private boolean isActive = false;
 
@@ -59,24 +61,11 @@ public class MeasurementTool
     {
         this.chart = chart;
 
-        chart.getPlotArea().addListener(SWT.MouseDown, this::handleEvent);
-        chart.getPlotArea().addListener(SWT.MouseMove, this::handleEvent);
-        chart.getPlotArea().addListener(SWT.MouseUp, this::handleEvent);
+        chart.getPlotArea().addListener(SWT.MouseDown, this::onMouseDown);
+        chart.getPlotArea().addListener(SWT.MouseMove, this::onMouseMove);
+        chart.getPlotArea().addListener(SWT.MouseUp, this::onMouseUp);
 
-        ((IPlotArea) chart.getPlotArea()).addCustomPaintListener(new ICustomPaintListener()
-        {
-            @Override
-            public void paintControl(PaintEvent e)
-            {
-                MeasurementTool.this.paintControl(e);
-            }
-
-            @Override
-            public boolean drawBehindSeries()
-            {
-                return false;
-            }
-        });
+        chart.getPlotArea().addPaintListener(this::paintControl);
     }
 
     public Color getColor()
@@ -91,7 +80,10 @@ public class MeasurementTool
 
     public void addButtons(ToolBarManager toolBar)
     {
-        toolBar.add(createAction());
+        var action = createAction();
+        // store buttons to update their image on context menu action
+        buttons.add(action);
+        toolBar.add(action);
     }
 
     public void addContextMenu(IMenuManager manager)
@@ -105,8 +97,12 @@ public class MeasurementTool
                         isActive ? Images.MEASUREMENT_ON : Images.MEASUREMENT_OFF, //
                         a -> {
                             isActive = !isActive;
-                            a.setImageDescriptor(isActive ? Images.MEASUREMENT_ON.descriptor()
-                                            : Images.MEASUREMENT_OFF.descriptor());
+
+                            // update images of tool bar buttons
+                            ImageDescriptor image = isActive ? Images.MEASUREMENT_ON.descriptor()
+                                            : Images.MEASUREMENT_OFF.descriptor();
+                            buttons.forEach(button -> button.setImageDescriptor(image));
+
                             chart.getToolTip().setActive(!isActive);
 
                             if (!isActive)
@@ -118,49 +114,41 @@ public class MeasurementTool
                         });
     }
 
-    private void handleEvent(Event e)
+    private void onMouseDown(Event e)
     {
-        if (!isActive)
+        if (!isActive || e.button != 1)
             return;
 
-        switch (e.type)
-        {
-            case SWT.MouseDown:
-                if (e.button == 1)
-                {
-                    if (redrawOnMove) // click'n'click mode
-                        end = Spot.from(e, chart);
-                    else // new line
-                        start = end = Spot.from(e, chart);
+        if (redrawOnMove) // click'n'click mode
+            end = Spot.from(e, chart);
+        else // new line
+            start = end = Spot.from(e, chart);
 
-                    redrawOnMove = true;
-                    chart.redraw();
-                }
-                return;
+        redrawOnMove = true;
+        chart.redraw();
+    }
 
-            case SWT.MouseMove:
-                if (redrawOnMove)
-                {
-                    end = Spot.from(e, chart);
-                    chart.redraw();
-                }
-                return;
+    private void onMouseMove(Event e)
+    {
+        if (!isActive || !redrawOnMove)
+            return;
 
-            case SWT.MouseUp:
-                if (start != null && e.button == 1)
-                {
-                    // if enough time has elapsed, assume it was click'n'drag
-                    // mode (otherwise continue in click'n'click mode)
-                    if (e.time - start.time > 300)
-                        redrawOnMove = false;
+        end = Spot.from(e, chart);
+        chart.redraw();
+    }
 
-                    end = Spot.from(e, chart);
-                    chart.redraw();
-                }
-                return;
-            default:
-                return;
-        }
+    private void onMouseUp(Event e)
+    {
+        if (!isActive || start == null || e.button != 1)
+            return;
+
+        // if enough time has elapsed, assume it was click'n'drag
+        // mode (otherwise continue in click'n'click mode)
+        if (e.time - start.time > 300)
+            redrawOnMove = false;
+
+        end = Spot.from(e, chart);
+        chart.redraw();
     }
 
     private void paintControl(PaintEvent e)
