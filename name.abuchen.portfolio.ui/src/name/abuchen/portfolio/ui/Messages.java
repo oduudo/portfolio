@@ -1201,9 +1201,6 @@ public class Messages extends NLS
     public static String SplitWizardReviewQuotesTitle;
     public static String SplitWizardReviewTransactionsDescription;
     public static String SplitWizardReviewTransactionsTitle;
-    public static String SurveyIcon;
-    public static String SurveyReminder;
-    public static String SurveyTooltip;
     public static String EventWizardTitle;
     public static String EventWizardDescription;
     public static String EventWizardLabelMessage;
