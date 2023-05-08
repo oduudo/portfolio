@@ -611,6 +611,7 @@ public class Messages extends NLS
     public static String LabelError;
     public static String LabelErrorNoHoldings;
     public static String LabelErrorNoTaxonomySelected;
+    public static String LabelErrorProtocolDetails;
     public static String LabelEurostatRegion;
     public static String LabelExcessReturnBaselineDataSeries;
     public static String LabelExcessReturnOperator;
@@ -1011,6 +1012,7 @@ public class Messages extends NLS
     public static String NewFileWizardTaxonomyTitle;
     public static String PageDescriptionSelectSecurity;
     public static String PageTitleSelectSecurity;
+    public static String PDFImportDebugInformation;
     public static String PDFImportDebugTextExtraction;
     public static String PDFImportFilterName;
     public static String PDFImportWizardDescription;
