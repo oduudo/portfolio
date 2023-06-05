@@ -2,7 +2,6 @@ package name.abuchen.portfolio.ui.views.payments;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -11,33 +10,37 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.swtchart.Chart;
+import org.swtchart.IAxis;
+import org.swtchart.IAxis.Position;
 import org.swtchart.IBarSeries;
 import org.swtchart.ISeries.SeriesType;
+import org.swtchart.LineStyle;
 
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.Colors;
 import name.abuchen.portfolio.ui.util.chart.TimelineChartToolTip;
+import name.abuchen.portfolio.ui.util.format.ThousandsNumberFormat;
 import name.abuchen.portfolio.ui.util.swt.ColoredLabel;
 import name.abuchen.portfolio.ui.views.payments.PaymentsViewModel.Line;
 import name.abuchen.portfolio.util.TextUtil;
 
-public class PaymentsPerYearChartTab extends AbstractChartTab
+public class PaymentsPerYearChartBuilder implements PaymentsChartBuilder
 {
-    private class DividendPerYearToolTip extends TimelineChartToolTip
+    private static class DividendPerYearToolTip extends TimelineChartToolTip
     {
-        private PaymentsViewModel model;
-
-        public DividendPerYearToolTip(Chart chart, PaymentsViewModel model)
+        public DividendPerYearToolTip(Chart chart)
         {
             super(chart);
 
-            this.model = model;
+            enableCategory(true);
         }
 
         @Override
         protected void createComposite(Composite parent)
         {
+            PaymentsViewModel model = (PaymentsViewModel) getChart().getData(PaymentsViewModel.class.getSimpleName());
+
             final int year = (Integer) getFocusedObject();
             int totalNoOfMonths = model.getNoOfMonths();
 
@@ -59,7 +62,7 @@ public class PaymentsPerYearChartTab extends AbstractChartTab
                                 return false;
                             })
                             .sorted((l1, l2) -> TextUtil.compare(l1.getVehicle().getName(), l2.getVehicle().getName()))
-                            .collect(Collectors.toList());
+                            .toList();
 
             final Composite container = new Composite(parent, SWT.NONE);
             container.setBackgroundMode(SWT.INHERIT_FORCE);
@@ -121,25 +124,36 @@ public class PaymentsPerYearChartTab extends AbstractChartTab
     }
 
     @Override
-    protected void attachTooltipTo(Chart chart)
+    public int getTabIndex()
     {
-        DividendPerYearToolTip toolTip = new DividendPerYearToolTip(chart, model);
-        toolTip.enableCategory(true);
-    }
-
-    private void updateCategorySeries()
-    {
-        int startYear = model.getStartYear();
-        String[] labels = new String[LocalDate.now().getYear() - startYear + 1];
-        for (int ii = 0; ii < labels.length; ii++)
-            labels[ii] = String.valueOf(startYear + ii);
-        getChart().getAxisSet().getXAxis(0).setCategorySeries(labels);
+        return 5;
     }
 
     @Override
-    protected void createSeries()
+    public void configure(Chart chart)
     {
-        updateCategorySeries();
+        IAxis xAxis = chart.getAxisSet().getXAxis(0);
+        xAxis.getTick().setVisible(true);
+        xAxis.getTitle().setVisible(false);
+        xAxis.getTitle().setText(Messages.ColumnYear);
+        xAxis.getGrid().setStyle(LineStyle.NONE);
+        xAxis.enableCategory(true);
+
+        IAxis yAxis = chart.getAxisSet().getYAxis(0);
+        yAxis.getTitle().setVisible(false);
+        yAxis.getTick().setVisible(true);
+        yAxis.setPosition(Position.Secondary);
+        yAxis.getTick().setFormat(new ThousandsNumberFormat());
+
+        new DividendPerYearToolTip(chart);
+    }
+
+    @Override
+    public void createSeries(Chart chart, PaymentsViewModel model)
+    {
+        chart.setData(PaymentsViewModel.class.getSimpleName(), model);
+
+        updateCategorySeries(chart, model);
 
         int startYear = model.getStartYear();
 
@@ -165,7 +179,8 @@ public class PaymentsPerYearChartTab extends AbstractChartTab
 
         if (hasNegativeNumber)
         {
-            IBarSeries barSeries = (IBarSeries) getChart().getSeriesSet().createSeries(SeriesType.BAR, getLabel());
+            IBarSeries barSeries = (IBarSeries) chart.getSeriesSet().createSeries(SeriesType.BAR,
+                            Messages.LabelPaymentsPerYear);
             barSeries.setYSeries(series);
             barSeries.setBarColor(Colors.DARK_BLUE);
         }
@@ -174,7 +189,7 @@ public class PaymentsPerYearChartTab extends AbstractChartTab
             for (int i = 0; i < series.length; i++)
             {
                 int year = model.getStartYear() + i;
-                IBarSeries barSeries = (IBarSeries) getChart().getSeriesSet().createSeries(SeriesType.BAR,
+                IBarSeries barSeries = (IBarSeries) chart.getSeriesSet().createSeries(SeriesType.BAR,
                                 String.valueOf(year));
 
                 double[] seriesX = new double[LocalDate.now().getYear() - startYear + 1];
@@ -182,10 +197,19 @@ public class PaymentsPerYearChartTab extends AbstractChartTab
 
                 barSeries.setYSeries(seriesX);
 
-                barSeries.setBarColor(getColor(year));
+                barSeries.setBarColor(PaymentsColors.getColor(year));
                 barSeries.setBarPadding(25);
                 barSeries.enableStack(true);
             }
         }
+    }
+
+    private void updateCategorySeries(Chart chart, PaymentsViewModel model)
+    {
+        int startYear = model.getStartYear();
+        String[] labels = new String[LocalDate.now().getYear() - startYear + 1];
+        for (int ii = 0; ii < labels.length; ii++)
+            labels[ii] = String.format("%02d", (startYear + ii) % 100); //$NON-NLS-1$
+        chart.getAxisSet().getXAxis(0).setCategorySeries(labels);
     }
 }

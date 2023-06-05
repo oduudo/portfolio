@@ -4,15 +4,12 @@ import static name.abuchen.portfolio.util.TextUtil.trim;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import name.abuchen.portfolio.Messages;
 import name.abuchen.portfolio.model.ClientSettings;
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.online.SecuritySearchProvider;
@@ -58,26 +55,18 @@ public class LeewaySearchProvider implements SecuritySearchProvider
         public static Result from(JSONObject json)
         {
             // Extract values from the JSON object
-            String code = (String) json.get("Code");
+            String tickerSymbol = (String) json.get("Code");
             String exchange = (String) json.get("Exchange");
             String name = (String) json.get("Name");
             String type = (String) json.get("Type");
             String isin = (String) json.get("ISIN");
             String currencyCode = (String) json.get("currencyCode");
 
-            // Map security types to standard values
-            Map<String, String> typeMap = new HashMap<>();
-            typeMap.put("common stock", SecuritySearchProvider.Type.SHARE.toString());
-            typeMap.put("bond", SecuritySearchProvider.Type.BOND.toString());
-            typeMap.put("etf", Messages.LabelSearchETF);
-            typeMap.put("etc", Messages.LabelSearchETC);
-            typeMap.put("fund", Messages.LabelSearchFund);
-
-            // Convert the security type to a standard value
-            type = typeMap.getOrDefault(trim(type.toLowerCase()), "");
+            // Convert the security type using the SecuritySearchProvider instance
+            type = SecuritySearchProvider.convertType(trim(type.toLowerCase()));
 
             // Combine the symbol and exchange codes to create the security ID
-            StringBuilder symbol = new StringBuilder(code);
+            StringBuilder symbol = new StringBuilder(tickerSymbol);
             symbol.append(".");
             symbol.append(exchange);
 

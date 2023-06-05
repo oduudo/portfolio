@@ -38,6 +38,7 @@ import name.abuchen.portfolio.online.impl.KrakenQuoteFeed;
 import name.abuchen.portfolio.online.impl.LeewayQuoteFeed;
 import name.abuchen.portfolio.online.impl.PortfolioReportQuoteFeed;
 import name.abuchen.portfolio.online.impl.QuandlQuoteFeed;
+import name.abuchen.portfolio.online.impl.TwelveDataQuoteFeed;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.PortfolioPlugin;
 import name.abuchen.portfolio.ui.util.BindingHelper;
@@ -223,6 +224,8 @@ public class HistoricalQuoteProviderPage extends AbstractQuoteProviderPage
             return KrakenQuoteFeed.ID + getModel().getTickerSymbol();
         else if (LeewayQuoteFeed.ID.equals(getFeed()))
             return LeewayQuoteFeed.ID + getModel().getTickerSymbol();
+        else if (TwelveDataQuoteFeed.ID.equals(getFeed()))
+            return TwelveDataQuoteFeed.ID + getModel().getTickerSymbol();
         else if (CoinGeckoQuoteFeed.ID.equals(getFeed()))
             return CoinGeckoQuoteFeed.ID //
                             + getModel().getTickerSymbol() //
@@ -328,7 +331,19 @@ public class HistoricalQuoteProviderPage extends AbstractQuoteProviderPage
 
                         feedData = data;
 
-                        tableSampleData.setInput(data.getLatestPrices());
+                        // check for an error message in the response object if
+                        // no prices are returned
+                        if (data.getLatestPrices().isEmpty() && !data.getErrors().isEmpty())
+                        {
+                            String[] messages = data.getErrors().stream().map(e -> e.getMessage()).toList()
+                                            .toArray(new String[0]);
+                            tableSampleData.setMessages(messages);
+                        }
+                        else
+                        {
+                            tableSampleData.setInput(data.getLatestPrices());
+                        }
+
                         tableSampleData.refresh();
 
                         showRawResponse.setEnabled(!data.getResponses().isEmpty());
