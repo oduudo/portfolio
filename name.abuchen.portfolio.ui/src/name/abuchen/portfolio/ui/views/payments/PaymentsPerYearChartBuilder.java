@@ -69,7 +69,7 @@ public class PaymentsPerYearChartBuilder implements PaymentsChartBuilder
                             .toList();
 
             builder.addColumns( //
-                            new Column(Messages.ColumnSecurity, SWT.LEFT).withLogo(),
+                            new Column(Messages.ColumnSecurity, SWT.LEFT, 220).withLogo(),
                             new Column(String.valueOf(model.getStartYear() + year))
                                             .withBackgroundColor(PaymentsColors.getColor(model.getStartYear() + year))
                                             .withFormatter(cell -> Values.Amount.format((long) cell)));
@@ -94,7 +94,7 @@ public class PaymentsPerYearChartBuilder implements PaymentsChartBuilder
             long value = 0;
             for (int m = year * 12; m < (year + 1) * 12 && m < totalNoOfMonths; m += 1)
                 value += model.getSum().getValue(m);
-            builder.addFooter(Messages.ColumnSum, value);
+            builder.setFooter(Messages.ColumnSum, value);
         }
     }
 
@@ -178,7 +178,7 @@ public class PaymentsPerYearChartBuilder implements PaymentsChartBuilder
 
                 barSeries.setYSeries(seriesX);
 
-                barSeries.setBarColor(PaymentsColors.getColor(chart.getDisplay(), year));
+                barSeries.setBarColor(PaymentsColors.getColor(year));
                 barSeries.setBarPadding(25);
                 barSeries.enableStack(true);
             }

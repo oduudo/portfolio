@@ -71,7 +71,7 @@ public class PaymentsPerQuarterChartBuilder implements PaymentsChartBuilder
 
             int noOfYears = (totalNoOfMonths / 12) + (totalNoOfMonths % 12 > quarter * 3 ? 1 : 0);
 
-            builder.addColumns(new Column(Messages.ColumnSecurity, SWT.LEFT).withLogo());
+            builder.addColumns(new Column(Messages.ColumnSecurity, SWT.LEFT, 220).withLogo());
             for (int year = 0; year < noOfYears; year++)
             {
                 builder.addColumns(new Column(String.valueOf(model.getStartYear() + year))
@@ -124,7 +124,7 @@ public class PaymentsPerQuarterChartBuilder implements PaymentsChartBuilder
                     value += model.getSum().getValue(mQuarter);
                 row[index++] = value;
             }
-            builder.addFooter(row);
+            builder.setFooter(row);
         }
     }
 
@@ -191,7 +191,7 @@ public class PaymentsPerQuarterChartBuilder implements PaymentsChartBuilder
             }
             barSeries.setYSeries(series);
 
-            barSeries.setBarColor(PaymentsColors.getColor(chart.getDisplay(), year));
+            barSeries.setBarColor(PaymentsColors.getColor(year));
             barSeries.setBarPadding(25);
         }
     }
