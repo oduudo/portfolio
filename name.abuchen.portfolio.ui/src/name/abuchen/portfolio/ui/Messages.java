@@ -5,11 +5,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
     private static final String BUNDLE_NAME = "name.abuchen.portfolio.ui.messages"; //$NON-NLS-1$
-    public static String AboutTextOtherSoftware;
-    public static String AboutTextTranslationDevelopers;
     public static String AboutTextDeveloped;
     public static String AboutText;
-    public static String AboutTextDevelopers;
     public static String AccountFilterRetiredAccounts;
     public static String AccountMenuActivate;
     public static String AccountMenuAdd;
@@ -393,6 +390,7 @@ public class Messages extends NLS
     public static String DividendsDialogLabelSpecialDistribution;
     public static String DividendsDialogTitleShares;
     public static String DivvyDiaryConfirmUpload;
+    public static String DivvyDiaryIncludeTransactionHistory;
     public static String DivvyDiaryMissingAPIKey;
     public static String DivvyDiaryMsgUploading;
     public static String DivvyDiaryUploadSuccessfulMsg;
@@ -616,6 +614,7 @@ public class Messages extends NLS
     public static String LabelEarningsPerYear;
     public static String LabelEarningsTransactionList;
     public static String LabelEmptyDashboard;
+    public static String LabelEmptyTaxonomy;
     public static String LabelExpand;
     public static String LabelExpandAll;
     public static String LabelExpenses;
@@ -847,6 +846,7 @@ public class Messages extends NLS
     public static String LabelViewTaxonomyDefinition;
     public static String LabelViewTreeMap;
     public static String LabelVolatility;
+    public static String LabelWatchlist;
     public static String LabelWithoutClassification;
     public static String LabelXDays;
     public static String LabelYear;
