@@ -594,8 +594,10 @@ public class Messages extends NLS
     public static String LabelConvertBuySellIntoDeliveryTransactions;
     public static String LabelCopyToClipboard;
     public static String LabelCountry;
+    public static String LabelCrosshair;
     public static String LabelCurrencies;
     public static String LabelCurrencyConverter;
+    public static String LabelCurrentConfiguration;
     public static String LabelCurrentDate;
     public static String LabelCurrentMonth;
     public static String LabelCurrentQuarter;
@@ -677,6 +679,7 @@ public class Messages extends NLS
     public static String LabelNotAvailable;
     public static String LabelNumberDataSeries;
     public static String LabelOneOfX;
+    public static String LabelOnlyLinkToPortfolioReport;
     public static String LabelOpenTrade;
     public static String FilterOnlyOpenTrades;
     public static String LabelOrderByTaxonomy;
@@ -712,6 +715,7 @@ public class Messages extends NLS
     public static String LabelQuandlColumnNameQuoteHint;
     public static String LabelQuote;
     public static String LabelQuoteFeed;
+    public static String LabelQuoteFeedConfiguration;
     public static String LabelQuoteFeedProvider;
     public static String LabelRatio;
     public static String LabelRefresh;
@@ -746,6 +750,7 @@ public class Messages extends NLS
     public static String LabelSaveInFile;
     public static String LabelSaving;
     public static String LabelSearch;
+    public static String LabelSearchForQuoteFeeds;
     public static String LabelSecurities;
     public static String LabelSecurityLatestPrice;
     public static String LabelSecurityPerformance;
@@ -835,6 +840,7 @@ public class Messages extends NLS
     public static String LabelUnknownVersion;
     public static String LabelUnnamedFile;
     public static String LabelUnnamedXml;
+    public static String LabelUpdatedConfiguration;
     public static String LabelUpdatesAvailable;
     public static String LabelUseGrossValue;
     public static String LabelUsingDashboardDefaultReportingPeriod;
@@ -895,6 +901,7 @@ public class Messages extends NLS
     public static String MenuDeleteAllTransactions;
     public static String MenuDeleteDashboardColumn;
     public static String MenuDeleteWidget;
+    public static String MenuDoNotChange;
     public static String MenuEditInvestmentPlan;
     public static String MenuEditTransaction;
     public static String MenuExportChartData;

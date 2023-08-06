@@ -11,7 +11,7 @@
 	<name>Portfolio Performance</name>
 
 	<properties>
-		<tycho-version>3.0.5</tycho-version>
+		<tycho-version>4.0.1</tycho-version>
 		<jarsigner.skip>true</jarsigner.skip>
 		<gpgsigner.skip>true</gpgsigner.skip>
 		<applesigner.skip>true</applesigner.skip>
@@ -42,7 +42,7 @@
 		<repository>
 			<id>portfolio-jre</id>
 			<layout>p2</layout>
-			<url>https://www.portfolio-performance.info/bundled-jre/17.0.5</url>
+			<url>http://portfolio-performance.github.io/bundled-jre/17.0.5</url>
 		</repository>
 	</repositories>
 
