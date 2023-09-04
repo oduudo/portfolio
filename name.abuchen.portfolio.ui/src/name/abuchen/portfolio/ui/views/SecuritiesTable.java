@@ -208,6 +208,7 @@ public final class SecuritiesTable implements ModificationListener
         addColumnDateOfLatestPrice();
         addColumnDateOfLatestHistoricalPrice();
         addQuoteDeltaColumn();
+        addPARColumn();
         support.addColumn(new DistanceFromMovingAverageColumn(LocalDate::now));
         support.addColumn(new DistanceFromAllTimeHighColumn(LocalDate::now,
                         view.getPart().getReportingPeriods().stream().collect(toMutableList())));
@@ -222,7 +223,6 @@ public final class SecuritiesTable implements ModificationListener
         addAttributeColumns();
         addQuoteFeedColumns();
         addDataQualityColumns();
-        addPARColumn();
 
         support.createColumns(true);
 
@@ -610,7 +610,7 @@ public final class SecuritiesTable implements ModificationListener
     {
         // create a modifiable copy as all menus share the same list of
         // reporting periods
-        List<ReportingPeriod> options = new ArrayList<>(view.getPart().getReportingPeriods());
+        List<ReportingPeriod> options = view.getPart().getReportingPeriods().stream().collect(toMutableList());
 
         BiFunction<Object, ReportingPeriod, Double> valueProvider = (element, option) -> {
             
