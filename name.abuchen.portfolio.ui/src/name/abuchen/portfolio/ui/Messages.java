@@ -515,6 +515,8 @@ public class Messages extends NLS
     public static String LabelAllSecurities;
     public static String LabelAllTrades;
     public static String LabelAllTransactions;
+    public static String LabelAllInboundTransactions;
+    public static String LabelAllOutboundTransactions;
     public static String LabelAssetChart;
     public static String LabelAvailableAttributes;
     public static String LabelAverageHoldingPeriod;
@@ -525,6 +527,7 @@ public class Messages extends NLS
     public static String LabelBeforeTaxAndFees;
     public static String LabelBenchmarks;
     public static String LabelBiggerSize;
+    public static String LabelPurchaseTransactionsOnly;
     public static String LabelEarningsByTaxonomy;
     public static String LabelCapitalGains;
     public static String LabelCategoryOtherMovements;
@@ -763,6 +766,7 @@ public class Messages extends NLS
     public static String LabelSelectedTransactions;
     public static String LabelSelectYear;
     public static String LabelSelectYearSince;
+    public static String LabelSaleTransactionsOnly;
     public static String LabelSemiVolatility;
     public static String LabelSettings;
     public static String LabelShowOnlyOneYear;
@@ -833,6 +837,7 @@ public class Messages extends NLS
     public static String LabelTradesTurnoverRate;
     public static String LabelTradingActivityChart;
     public static String LabelTransactionCount;
+    public static String LabelTransactionFilter;
     public static String LabelTransactions;
     public static String LabelTransferals;
     public static String LabelTransfer;
