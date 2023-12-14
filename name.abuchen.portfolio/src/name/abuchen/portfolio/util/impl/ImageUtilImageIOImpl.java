@@ -9,8 +9,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -107,6 +110,8 @@ public class ImageUtilImageIOImpl extends ImageUtil
                 return null;
 
             BufferedImage imgData = ImageIO.read(new ByteArrayInputStream(buff));
+            if (imgData == null)
+                return null;
 
             return new Image(null, new ZoomingImageDataProvider(imgData, logicalWidth, logicalHeight));
         }
@@ -128,7 +133,59 @@ public class ImageUtilImageIOImpl extends ImageUtil
     @Override
     public String loadAndPrepare(String filename, int maxWidth, int maxHeight) throws IOException
     {
-        BufferedImage imgData = ImageIO.read(new File(filename));
+        BufferedImage imgData = null;
+
+        try (ImageInputStream input = ImageIO.createImageInputStream(new File(filename)))
+        {
+            Iterator<ImageReader> readers = ImageIO.getImageReaders(input);
+
+            if (!readers.hasNext())
+                return null;
+
+            ImageReader reader = readers.next();
+
+            try
+            {
+                reader.setInput(input);
+                if (reader.getFormatName().equalsIgnoreCase("ico")) //$NON-NLS-1$
+                {
+                    // ico files have multiple resolutions. We pick the largest
+                    // one with the best pixelSize that fits into maxWidth and
+                    // maxHeight
+                    var numImages = reader.getNumImages(true);
+                    if (numImages <= 0)
+                        return null;
+
+                    int size = 0;
+                    int pixelSize = 0;
+
+                    for (int ii = 0; ii < numImages; ii++)
+                    {
+                        BufferedImage icon = reader.read(ii);
+                        if ((icon.getWidth() > size
+                                        || (icon.getWidth() == size && icon.getColorModel().getPixelSize() > pixelSize))
+                                        && icon.getWidth() <= maxWidth)
+                        {
+                            imgData = icon;
+                            size = icon.getWidth();
+                            pixelSize = icon.getColorModel().getPixelSize();
+                        }
+                    }
+                }
+                else
+                {
+                    imgData = reader.read(0);
+                }
+
+            }
+            finally
+            {
+                reader.dispose();
+            }
+        }
+
+        if (imgData == null)
+            return null;
 
         if (imgData.getWidth() > maxWidth || imgData.getHeight() > maxHeight)
         {
