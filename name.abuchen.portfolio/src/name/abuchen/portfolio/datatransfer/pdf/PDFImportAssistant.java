@@ -33,6 +33,8 @@ public class PDFImportAssistant
         this.client = client;
         this.files = files;
 
+        extractors.add(new AJBellSecuritiesLimitedPDFExtractor(client));
+        extractors.add(new AvivaPLCPDFExtractor(client));
         extractors.add(new BaaderBankPDFExtractor(client));
         extractors.add(new BankSLMPDFExtractor(client));
         extractors.add(new BisonPDFExtractor(client));
@@ -55,7 +57,9 @@ public class PDFImportAssistant
         extractors.add(new EasyBankAGPDFExtractor(client));
         extractors.add(new EbasePDFExtractor(client));
         extractors.add(new ErsteBankPDFExtractor(client));
+        extractors.add(new FidelityInternationalPDFExtractor(client));
         extractors.add(new FILFondbankPDFExtractor(client));
+        extractors.add(new FindependentAGPDFExtractor(client));
         extractors.add(new FinTechGroupBankPDFExtractor(client));
         extractors.add(new GenoBrokerPDFExtractor(client));
         extractors.add(new HargreavesLansdownPlcExtractor(client));
@@ -68,6 +72,7 @@ public class PDFImportAssistant
         extractors.add(new NIBCBankPDFExtractor(client));
         extractors.add(new OldenburgischeLandesbankAGPDFExtractor(client));
         extractors.add(new LGTBankPDFExtractor(client));
+        extractors.add(new LiechtensteinischeLandesbankAGPDFExtractor(client));
         extractors.add(new LimeTradingCorpPDFExtractor(client));
         extractors.add(new MerkurPrivatBankPDFExtractor(client));
         extractors.add(new OnvistaPDFExtractor(client));
