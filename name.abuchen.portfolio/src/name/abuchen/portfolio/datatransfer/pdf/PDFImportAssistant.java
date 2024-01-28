@@ -34,6 +34,7 @@ public class PDFImportAssistant
         this.files = files;
 
         extractors.add(new AJBellSecuritiesLimitedPDFExtractor(client));
+        extractors.add(new AkfBankPDFExtractor(client));
         extractors.add(new AvivaPLCPDFExtractor(client));
         extractors.add(new BaaderBankPDFExtractor(client));
         extractors.add(new BankSLMPDFExtractor(client));
@@ -43,6 +44,7 @@ public class PDFImportAssistant
         extractors.add(new ComdirectPDFExtractor(client));
         extractors.add(new CommerzbankPDFExtractor(client));
         extractors.add(new CommSecPDFExtractor(client));
+        extractors.add(new ComputersharePDFExtractor(client));
         extractors.add(new ConsorsbankPDFExtractor(client));
         extractors.add(new CreditSuisseAGPDFExtractor(client));
         extractors.add(new CrowdestorPDFExtractor(client));
