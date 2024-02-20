@@ -9,11 +9,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -94,6 +94,7 @@ import name.abuchen.portfolio.datatransfer.csv.CSVConfigManager;
 import name.abuchen.portfolio.datatransfer.csv.CSVExtractor;
 import name.abuchen.portfolio.datatransfer.csv.CSVImporter;
 import name.abuchen.portfolio.datatransfer.csv.CSVImporter.AmountField;
+import name.abuchen.portfolio.datatransfer.csv.CSVImporter.AnnotatedParsePosition;
 import name.abuchen.portfolio.datatransfer.csv.CSVImporter.Column;
 import name.abuchen.portfolio.datatransfer.csv.CSVImporter.DateField;
 import name.abuchen.portfolio.datatransfer.csv.CSVImporter.EnumField;
@@ -565,7 +566,7 @@ public class CSVImportDefinitionPage extends AbstractWizardPage
 
             doUpdateErrorMessages();
         }
-        catch (IOException e)
+        catch (IOException | UncheckedIOException e)
         {
             PortfolioPlugin.log(e);
             ErrorDialog.openError(getShell(), Messages.LabelError, e.getMessage(),
@@ -705,24 +706,27 @@ public class CSVImportDefinitionPage extends AbstractWizardPage
             if (column.getField() == null)
                 return null;
 
-            try
+            if (column.getFormat() != null)
             {
-                if (column.getFormat() != null)
+                String text = getColumnText(element, columnIndex);
+                if (text != null && !text.isEmpty())
                 {
-                    String text = getColumnText(element, columnIndex);
-                    if (text != null && !text.isEmpty())
-                    {
-                        column.getFormat().getFormat().parseObject(TextUtil.stripNonNumberCharacters(text));
-                        return GREEN;
-                    }
-                }
+                    var position = new AnnotatedParsePosition(0);
+                    column.getFormat().getFormat().parseObject(text, position);
 
-                return column.getField().isOptional() ? LIGHTGREEN : GREEN;
+                    if (position.getIndex() == 0)
+                    {
+                        return column.getField().isOptional() ? Colors.theme().warningBackground() : ERROR;
+                    }
+                    else
+                    {
+                        return position.isTrimmed() ? Colors.theme().warningBackground() : GREEN;
+                    }
+
+                }
             }
-            catch (ParseException e)
-            {
-                return column.getField().isOptional() ? Colors.theme().warningBackground() : ERROR;
-            }
+
+            return column.getField().isOptional() ? LIGHTGREEN : GREEN;
         }
     }
 
@@ -798,7 +802,7 @@ public class CSVImportDefinitionPage extends AbstractWizardPage
             final Composite valueArea = new Composite(details, SWT.NONE);
             glf.applyTo(valueArea);
             label = new Label(valueArea, SWT.NONE);
-            label.setText(Messages.CSVImportLabelFormat);
+            label.setText(Messages.LabelDecimalSeparator);
             final ComboViewer valueFormats = new ComboViewer(valueArea, SWT.READ_ONLY);
             valueFormats.setContentProvider(ArrayContentProvider.getInstance());
             valueFormats.getCombo().select(0);
