@@ -5,7 +5,7 @@
 
 	<groupId>name.abuchen.portfolio</groupId>
 	<artifactId>portfolio-app</artifactId>
-	<version>0.68.4-SNAPSHOT</version>
+	<version>0.68.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Portfolio Performance</name>
@@ -422,7 +422,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-gpg-plugin</artifactId>
-					<version>3.2.3</version>
+					<version>3.2.4</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
