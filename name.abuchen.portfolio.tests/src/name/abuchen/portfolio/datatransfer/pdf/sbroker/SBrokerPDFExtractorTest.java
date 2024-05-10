@@ -25,6 +25,7 @@ import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.purchase;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.removal;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.sale;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.security;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.taxRefund;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.taxes;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.withFailureMessage;
 import static name.abuchen.portfolio.datatransfer.ExtractorTestUtilities.countAccountTransactions;
@@ -4765,6 +4766,33 @@ public class SBrokerPDFExtractorTest
                         Messages.MsgErrorTransactionTypeNotSupported, //
                         interest(hasDate("2020-06-30"), hasAmount("EUR", 0.00), //
                         hasSource("GiroKontoauszug40.txt"), hasNote("Abrechnungszeitraum vom 01.04.2020 bis 30.06.2020")))));
+    }
+
+    @Test
+    public void testGiroKontoauszug41()
+    {
+        SBrokerPDFExtractor extractor = new SBrokerPDFExtractor(new Client());
+
+        List<Exception> errors = new ArrayList<>();
+
+        List<Item> results = extractor.extract(PDFInputFile.loadTestCase(getClass(), "GiroKontoauszug41.txt"),
+                        errors);
+
+        assertThat(errors, empty());
+        assertThat(countSecurities(results), is(0L));
+        assertThat(countBuySell(results), is(0L));
+        assertThat(countAccountTransactions(results), is(2L));
+        assertThat(results.size(), is(2));
+        new AssertImportActions().check(results, CurrencyUnit.EUR);
+
+        // assert transaction
+        assertThat(results, hasItem(removal(hasDate("2024-04-04"), hasAmount("EUR", 0.07), //
+                        hasSource("GiroKontoauszug41.txt"), hasNote("Überweisung online"))));
+
+        // assert transaction
+        assertThat(results, hasItem(taxRefund(hasDate("2024-04-08"), hasAmount("EUR", 0.02), //
+                        hasSource("GiroKontoauszug41.txt"), hasNote("Buchung beleglos"))));
+
     }
 
     @Test

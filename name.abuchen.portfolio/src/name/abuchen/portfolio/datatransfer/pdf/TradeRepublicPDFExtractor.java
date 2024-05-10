@@ -4,8 +4,14 @@ import static name.abuchen.portfolio.util.TextUtil.concatenate;
 import static name.abuchen.portfolio.util.TextUtil.trim;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import name.abuchen.portfolio.Messages;
+import name.abuchen.portfolio.datatransfer.DocumentContext;
 import name.abuchen.portfolio.datatransfer.ExtrExchangeRate;
 import name.abuchen.portfolio.datatransfer.ExtractorUtils;
 import name.abuchen.portfolio.datatransfer.pdf.PDFParser.Block;
@@ -26,13 +32,15 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
         super(client);
 
         addBankIdentifier("TRADE REPUBLIC");
+        addBankIdentifier("Trade Republic Bank GmbH");
 
         addBuySellTransaction();
         addSellWithNegativeAmountTransaction();
         addBuySellCryptoTransaction();
         addDividendeTransaction();
         addAdvanceTaxTransaction();
-        addAccountStatementTransaction();
+        addAccountStatementTransaction_Format01();
+        addAccountStatementTransaction_Format02();
         addTaxesStatementTransaction();
         addTaxesCorrectionStatementTransaction();
         addDepositStatementTransaction();
@@ -55,7 +63,8 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                         + "|SECURITIES SETTLEMENT SAVINGS PLAN" //
                         + "|SECURITIES SETTLEMENT" //
                         + "|REINVESTIERUNG" //
-                        + "|INVESTISSEMENT"
+                        + "|CONFIRMATION DE L.INVESTISSEMENT PROGRAMM."
+                        + "|RELEV. DE TRANSACTION"
                         + "|REGOLAMENTO TITOLI"
                         + "|ZWANGS.BERNAHME"
                         + "|TILGUNG)", //
@@ -78,11 +87,13 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
                         // Is type --> "Verkauf" change from BUY to SELL
                         .section("type").optional() //
-                        .match("^((Limit|Stop\\-Market|Market)\\-Order(\\s)?)?" //
+                        .match("(?i)^((Limit|Stop\\-Market|Market)\\-Order(\\s)?)?" //
                                         + "(?<type>(Kauf" //
                                         + "|Buy"
+                                        + "|Achat"
                                         + "|Acquisto" //
-                                        + "|Verkauf" //
+                                        + "|Verkauf"
+                                        + "|Sell" //
                                         + "|Sparplanausf.hrung" //
                                         + "|SAVINGS PLAN" //
                                         + "|Ex.cution de l.investissement programm." //
@@ -92,6 +103,7 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                                         + ".*$") //
                         .assign((t, v) -> {
                             if ("Verkauf".equals(v.get("type")) //
+                                            || "Sell".equals(v.get("type")) //
                                             || "ZWANGSÜBERNAHME".equals(v.get("type")) //
                                             || "TILGUNG".equals(v.get("type")))
                                 t.setType(PortfolioTransaction.Type.SELL);
@@ -215,10 +227,16 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                                         // Limit-Order Buy on 28.04.2023 at 11:13 (Europe/Berlin).
                                         // Verkauf am 26.02.2021, um 11:44 Uhr.
                                         // Market-OrderAcquisto il 01.06.2023 alle 10:46 (Europe/Berlin) su Lang & Schwarz Exchange.
+                                        // Market-Order Sell on 02.05.2023 at 18:18 (Europe/Berlin).
+                                        // Market-Order Achat le 10/04/2024 à 17:33 (Europe/Berlin).
                                         // @formatter:on
                                         section -> section //
                                                         .attributes("date", "time") //
-                                                        .match("^((Limit|Stop\\-Market|Market)\\-Order(\\s)?)?(Buy|Acquisto|Kauf|Verkauf) .* (?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2}))(,)? (um|at|alle) (?<time>[\\d]{2}:[\\d]{2}) .*$") //
+                                                        .match("^((Limit|Stop\\-Market|Market)\\-Order(\\s)?)?(Buy|Achat|Acquisto|Kauf|Verkauf|Sell) .* " //
+                                                                        + "(?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}" //
+                                                                        + "|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2}" //
+                                                                        + "|[\\d]{2}\\/[\\d]{2}\\/[\\d]{4}))" //
+                                                                        + "(,)? (um|at|alle|.) (?<time>[\\d]{2}:[\\d]{2}).*$") //
                                                         .assign((t, v) -> t.setDate(asDate(v.get("date"), v.get("time")))),
                                         // @formatter:off
                                         // Exécution de l'investissement programmé le 17/01/2022 sur le Lang & Schwarz Exchange.
@@ -230,10 +248,11 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                                         // @formatter:off
                                         // Sparplanausführung am 18.11.2019 an der Lang & Schwarz Exchange.
                                         // Savings plan execution on 16.05.2023 on the Lang & Schwarz Exchange.
+                                        // Saveback execution on 02.05.2024 on the Lang & Schwarz Exchange.
                                         // @formatter:on
                                         section -> section //
                                                         .attributes("date") //
-                                                        .match("^(Sparplanausf.hrung|Savings plan) .* (?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2})) .*$") //
+                                                        .match("^(Sparplanausf.hrung|(Savings plan|Saveback) execution) .* (?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2})) .*$") //
                                                         .assign((t, v) -> t.setDate(asDate(v.get("date")))),
                                         // @formatter:off
                                         // Ausführung von Round up am 09.02.2024 an der Lang & Schwarz Exchange.
@@ -418,6 +437,13 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                                                         .match("^.*ORDER (?<note>.*\\-.*)$") //
                                                         .assign((t, v) -> t.setNote("Order: " + trim(v.get("note")))),
                                         // @formatter:off
+                                        // 75000 Paris ORDRE 69da-1c6f
+                                        // @formatter:on
+                                        section -> section //
+                                                        .attributes("note") //
+                                                        .match("^.*ORDRE (?<note>.*\\-.*)$") //
+                                                        .assign((t, v) -> t.setNote("Ordre : " + trim(v.get("note")))),
+                                        // @formatter:off
                                         // 23537 DCrFCrYea AUSFÜHRUNG 5437-f7f5
                                         // @formatter:on
                                         section -> section //
@@ -527,17 +553,14 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
     private void addSellWithNegativeAmountTransaction()
     {
         DocumentType type = new DocumentType("(WERTPAPIERABRECHNUNG" //
-                        + "|WERTPAPIERABRECHNUNG SPARPLAN" //
-                        + "|SECURITIES SETTLEMENT SAVINGS PLAN" //
                         + "|SECURITIES SETTLEMENT" //
-                        + "|REINVESTIERUNG" //
-                        + "|INVESTISSEMENT)", //
+                        + "|REGOLAMENTO TITOLI)", //
                         "(ABRECHNUNG CRYPTOGESCH.FT|CRYPTO SPARPLAN)");
         this.addDocumentTyp(type);
 
         Transaction<AccountTransaction> pdfTransaction = new Transaction<>();
 
-        Block firstRelevantLine = new Block("^(.*\\-Order )?Verkauf.*$");
+        Block firstRelevantLine = new Block("^(.*\\-Order )?(Verkauf|Sell).*$");
         type.addBlock(firstRelevantLine);
         firstRelevantLine.set(pdfTransaction);
 
@@ -556,26 +579,51 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                         // ISIN: DE000A3H23V7
                         // @formatter:on
                         .section("name", "currency", "nameContinued", "isin") //
-                        .match("^(?<name>.*) [\\.,\\d]+ Stk\\. [\\.,\\d]+ (?<currency>[\\w]{3}) [\\.,\\d]+ [\\w]{3}$") //
+                        .match("^(?<name>.*) [\\.,\\d]+ (Stk\\.|titre\\(s\\)|Pcs\\.|Pz\\.) [\\.,\\d]+ (?<currency>[\\w]{3}) [\\.,\\d]+ [\\w]{3}$") //
                         .match("^(?<nameContinued>.*)$") //
                         .match("^(ISIN: )?(?<isin>[A-Z]{2}[A-Z0-9]{9}[0-9])$") //
                         .assign((t, v) -> t.setSecurity(getOrCreateSecurity(v)))
 
-                        // @formatter:off
-                        // Clinuvel Pharmaceuticals Ltd. 80 Stk. 22,82 EUR 1.825,60 EUR
-                        // @formatter:on
-                        .section("shares") //
-                        .match("^.* (?<shares>[\\.,\\d]+) Stk\\. [\\.,\\d]+ [\\w]{3} [\\.,\\d]+ [\\w]{3}$") //
-                        .assign((t, v) -> t.setShares(asShares(v.get("shares"))))
+                        .oneOf( //
+                                        // @formatter:off
+                                        // Clinuvel Pharmaceuticals Ltd. 80 Stk. 22,82 EUR 1.825,60 EUR
+                                        // Tencent Holdings Ltd. 0,3773 titre(s) 53,00 EUR 20,00 EUR
+                                        // zjBAM Corp. 125 Pz. 29,75 EUR 3.718,75 EUR
+                                        // @formatter:on
+                                        section -> section //
+                                                        .attributes("shares") //
+                                                        .match("^.* (?<shares>[\\.,\\d]+) (Stk\\.|titre\\(s\\)|Pz\\.) .*$") //
+                                                        .assign((t, v) -> t.setShares(asShares(v.get("shares")))),
+                                        // @formatter:off
+                                        // Berkshire Hathaway Inc. 0.3367 Pcs. 297.00 EUR 100.00 EUR
+                                        // @formatter:on
+                                        section -> section //
+                                                        .attributes("shares") //
+                                                        .match("^.* (?<shares>[\\.,\\d]+) Pcs\\. .*$") //
+                                                        .assign((t, v) -> t.setShares(asShares(v.get("shares"), "en", "US"))),
+                                        // @formatter:off
+                                        // Bundesrep.Deutschland 1.019 EUR 98,05 % 999,13 EUR
+                                        // @formatter:on
+                                        section -> section //
+                                                        .attributes("shares") //
+                                                        .match("^.* (?<shares>[\\.,\\d]+) [\\w]{3} [\\.,\\d]+ % [\\.,\\d]+ [\\w]{3}$")
+                                                        .assign((t, v) -> {
+                                                            // @formatter:off
+                                                            // Percentage quotation, workaround for bonds
+                                                            // @formatter:on
+                                                            BigDecimal shares = asBigDecimal(v.get("shares"));
+                                                            t.setShares(Values.Share.factorize(shares.doubleValue() / 100));
+                                                        }))
 
                         // @formatter:off
                         // Market-Order Verkauf am 18.06.2019, um 17:50 Uhr an der Lang & Schwarz Exchange.
                         // Stop-Market-Order Verkauf am 10.06.2020, um 11:42 Uhr.
                         // Limit-Order Verkauf am 21.07.2020, um 09:30 Uhr an der Lang & Schwarz Exchange.
                         // Verkauf am 26.02.2021, um 11:44 Uhr.
+                        // Market-Order Sell on 02.05.2023 at 18:18 (Europe/Berlin).
                         // @formatter:on
                         .section("date", "time") //
-                        .match("^((Limit|Stop-Market|Market)-Order )?(Kauf|Verkauf) .* (?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2})), um (?<time>[\\d]{2}:[\\d]{2}) .*$") //
+                        .match("^((Limit|Stop\\-Market|Market)\\-Order(\\s)?)?(Verkauf|Sell) .* (?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2}))(,)? (um|at|alle|.) (?<time>[\\d]{2}:[\\d]{2}).*$") //
                         .assign((t, v) -> t.setDateTime(asDate(v.get("date"), v.get("time"))))
 
                         // @formatter:off
@@ -583,15 +631,15 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                         // GESAMT -0,66 EUR
                         // @formatter:on
                         .section("negative").optional() //
-                        .match("^GESAMT [\\.,\\d]+ [\\w]{3}$") //
-                        .match("^GESAMT (?<negative>\\-)[\\.,\\d]+ [\\w]{3}$") //
+                        .match("^(GESAMT|TOTAL|TOTALE) [\\.,\\d]+ [\\w]{3}$") //
+                        .match("^(GESAMT|TOTAL|TOTALE) (?<negative>\\-)[\\.,\\d]+ [\\w]{3}$") //
                         .assign((t, v) -> type.getCurrentContext().putBoolean("negative", true))
 
                         // @formatter:off
                         // GESAMT -0,66 EUR
                         // @formatter:on
                         .section("negative").optional() //
-                        .match("^GESAMT (?<negative>\\-)[\\.,\\d]+ [\\w]{3}$") //
+                        .match("^(GESAMT|TOTAL|TOTALE) (?<negative>\\-)[\\.,\\d]+ [\\w]{3}$") //
                         .assign((t, v) -> {
                             if (!type.getCurrentContext().getBoolean("negative"))
                                 type.getCurrentContext().putBoolean("negative", true);
@@ -599,9 +647,11 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
                         // @formatter:off
                         // Fremdkostenzuschlag -1,00 EUR
+                        // External cost surcharge -1.00 EUR
+                        // Frais externes -1,00 EUR
                         // @formatter:on
                         .section("currency", "amount").optional() //
-                        .match("^Fremdkostenzuschlag \\-(?<amount>[\\.,\\d]+) (?<currency>[\\w]{3})$") //
+                        .match("^(Fremdkostenzuschlag|External cost surcharge|Frais externes) \\-(?<amount>[\\.,\\d]+) (?<currency>[\\w]{3})$") //
                         .assign((t, v) -> {
                             if (type.getCurrentContext().getBoolean("negative"))
                             {
@@ -1189,7 +1239,7 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                         });
     }
 
-    private void addAccountStatementTransaction()
+    private void addAccountStatementTransaction_Format01()
     {
         final DocumentType type = new DocumentType("KONTOAUSZUG", //
                         documentContext -> documentContext //
@@ -1211,11 +1261,17 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
         this.addDocumentTyp(type);
 
+        // @formatter:off
+        // 15.04.2020 Accepted PayIn:DE00000000000000 to DE0000000000000000 150,00
+        // 28.01.2021 Einzahlung akzeptiert: DE12345678912345678912 auf 123,45
+        // 01.04.2023 Customer c3e9411b-b0ab-4820-a3b3-48cd72f6963b inpayed net: 700,00
+        // @formatter:on
         Block depositBlock = new Block("^([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2}) " //
                         + "(Accepted PayIn" //
                         + "|Einzahlung akzeptiert" //
                         + "|Customer).*$");
         type.addBlock(depositBlock);
+        depositBlock.setMaxSize(1);
         depositBlock.set(new Transaction<AccountTransaction>()
 
                         .subject(() -> {
@@ -1226,10 +1282,10 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
                         .section("date", "amount") //
                         .documentContext("currency") //
-                        .match("(?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2})) " //
+                        .match("^(?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2})) " //
                                         + "(Accepted PayIn" //
                                         + "|Einzahlung akzeptiert" //
-                                        + "|Customer .* inpayed net):.* (?<amount>[\\.,\\d]+)") //
+                                        + "|Customer .* inpayed net):.* (?<amount>[\\.,\\d]+)$") //
                         .assign((t, v) -> {
                             t.setDateTime(asDate(v.get("date")));
                             t.setAmount(asAmount(v.get("amount")));
@@ -1238,9 +1294,12 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
                         .wrap(TransactionItem::new));
 
-        Block removalBlock = new Block("^([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2}) " //
-                        + "(Auszahlung an Referenzkonto).*$");
+        // @formatter:off
+        // 01.01.2023 Auszahlung an Referenzkonto -11.111,11
+        // @formatter:on
+        Block removalBlock = new Block("^([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2}) Auszahlung an Referenzkonto.*$");
         type.addBlock(removalBlock);
+        removalBlock.setMaxSize(1);
         removalBlock.set(new Transaction<AccountTransaction>()
 
                         .subject(() -> {
@@ -1251,8 +1310,7 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
                         .section("date", "amount") //
                         .documentContext("currency") //
-                        .match("(?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2})) " //
-                                        + "(Auszahlung an Referenzkonto) \\-(?<amount>[\\.,\\d]+)") //
+                        .match("^(?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2})) Auszahlung an Referenzkonto \\-(?<amount>[\\.,\\d]+)$") //
                         .assign((t, v) -> {
                             t.setDateTime(asDate(v.get("date")));
                             t.setAmount(asAmount(v.get("amount")));
@@ -1261,8 +1319,12 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
                         .wrap(TransactionItem::new));
 
+        // @formatter:off
+        // 04.11.2020 Steueroptimierung null 0000000000000000 4,20
+        // @formatter:on
         Block taxRefundBlock = new Block("([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2}) Steueroptimierung.*");
         type.addBlock(taxRefundBlock);
+        taxRefundBlock.setMaxSize(1);
         taxRefundBlock.set(new Transaction<AccountTransaction>()
 
                         .subject(() -> {
@@ -1273,7 +1335,7 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
                         .section("date", "amount") //
                         .documentContext("currency") //
-                        .match("(?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}-[\\d]{2}-[\\d]{2})) Steueroptimierung.* (?<amount>[\\.,\\d]+)") //
+                        .match("^(?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}-[\\d]{2}-[\\d]{2})) Steueroptimierung.* (?<amount>[\\.,\\d]+)$") //
                         .assign((t, v) -> {
                             t.setDateTime(asDate(v.get("date")));
                             t.setAmount(asAmount(v.get("amount")));
@@ -1282,8 +1344,12 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
                         .wrap(TransactionItem::new));
 
+        // @formatter:off
+        // 01.04.2023 Your interest payment 00,01
+        // @formatter:on
         Block interestBlock = new Block("([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2}) Your interest payment.*");
         type.addBlock(interestBlock);
+        interestBlock.setMaxSize(1);
         interestBlock.set(new Transaction<AccountTransaction>()
 
                         .subject(() -> {
@@ -1294,7 +1360,7 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
                         .section("date", "amount") //
                         .documentContext("currency") //
-                        .match("(?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}-[\\d]{2}-[\\d]{2})) Your interest payment (?<amount>[\\.,\\d]+)") //
+                        .match("^(?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}-[\\d]{2}-[\\d]{2})) Your interest payment (?<amount>[\\.,\\d]+)$") //
                         .assign((t, v) -> {
                             t.setDateTime(asDate(v.get("date")));
                             t.setAmount(asAmount(v.get("amount")));
@@ -1302,6 +1368,220 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                         })
 
                         .wrap(TransactionItem::new));
+    }
+
+    private void addAccountStatementTransaction_Format02()
+    {
+        final DocumentType type = new DocumentType("KONTO.BERSICHT", (context, lines) -> {
+            Pattern pAccountAmountTransaction = Pattern.compile("^.* [\\.,\\d]+ \\p{Sc} (?<amount>[\\.,\\d]+) (?<currency>\\p{Sc})$");
+            Pattern pAccountInitialSaldoTransaction = Pattern.compile("^Depotkonto (?<amount>[\\.,\\d]+) (?<currency>\\p{Sc}) [\\.,\\d]+ \\p{Sc} [\\.,\\d]+ \\p{Sc} [\\.,\\d]+ \\p{Sc}$");
+
+            AccountAmountTransactionHelper accountAmountTransactionHelper = new AccountAmountTransactionHelper();
+            context.putType(accountAmountTransactionHelper);
+
+            List<AccountAmountTransactionItem> itemsToAddToFront = new ArrayList<>();
+
+            for (int i = 0; i < lines.length; i++)
+            {
+                Matcher m = pAccountInitialSaldoTransaction.matcher(lines[i]);
+                if (m.matches())
+                {
+                    AccountAmountTransactionItem item = new AccountAmountTransactionItem();
+                    item.line = i + 1;
+                    item.currency = asCurrencyCode(m.group("currency"));
+                    item.amount = asAmount(m.group("amount"));
+
+                    itemsToAddToFront.add(item);
+                }
+            }
+
+            // Add items from pAccountInitialSaldoTransaction to the beginning of the list
+            accountAmountTransactionHelper.items.addAll(0, itemsToAddToFront);
+
+            for (int i = 0; i < lines.length; i++)
+            {
+                Matcher m = pAccountAmountTransaction.matcher(lines[i]);
+                if (m.matches())
+                {
+                    AccountAmountTransactionItem item = new AccountAmountTransactionItem();
+                    item.line = i + 1;
+                    item.currency = asCurrencyCode(m.group("currency"));
+                    item.amount = asAmount(m.group("amount"));
+
+                    accountAmountTransactionHelper.items.add(item);
+                }
+            }
+        });
+        this.addDocumentTyp(type);
+
+        // @formatter:off
+        // 02 Apr. Überweisung Einzahlung akzeptiert: DE7243872432 auf 2024 DE7243872432 1.200,00 € 51.352,41 €
+        // @formatter:on
+        Block depositBlock = new Block("^[\\d]{2} [\\w]{3,4}([\\.]{1})? .berweisung Einzahlung akzeptiert:.*$");
+        type.addBlock(depositBlock);
+        depositBlock.setMaxSize(1);
+        depositBlock.set(new Transaction<AccountTransaction>()
+
+                        .subject(() -> {
+                            AccountTransaction accountTransaction = new AccountTransaction();
+                            accountTransaction.setType(AccountTransaction.Type.DEPOSIT);
+                            return accountTransaction;
+                        })
+
+                        .section("date", "year", "amount", "currency") //
+                        .match("^(?<date>[\\d]{2} [\\w]{3,4}([\\.]{1})?) .berweisung Einzahlung akzeptiert:.* auf (?<year>[\\d]{4}) .* (?<amount>[\\.,\\d]+) (?<currency>\\p{Sc}) [\\.,\\d]+ \\p{Sc}$") //
+                        .assign((t, v) -> {
+                            t.setDateTime(asDate(v.get("date") + " " + v.get("year")));
+                            t.setAmount(asAmount(v.get("amount")));
+                            t.setCurrencyCode(asCurrencyCode(v.get("currency")));
+                        })
+
+                        .wrap(TransactionItem::new));
+
+        Block removalDepositBlock = new Block("^[\\d]{2} [\\w]{3,4}([\\.]{1})?[\\s]$");
+        type.addBlock(removalDepositBlock);
+        removalDepositBlock.set(new Transaction<AccountTransaction>()
+
+                        .subject(() -> {
+                            AccountTransaction accountTransaction = new AccountTransaction();
+                            accountTransaction.setType(AccountTransaction.Type.DEPOSIT);
+                            return accountTransaction;
+                        })
+
+                        .optionalOneOf( //
+                                        // @formatter:off
+                                        // 07 Apr.
+                                        // 2024 Kartentransaktion Backerei XAXRs 798 2,50 € 51.194,91 €
+                                        //
+                                        // 16 Apr.
+                                        // 2024 Kartentransaktion Visa Geld zurueck Aktion 0,08 € 18.584,55 €
+                                        // @formatter:on
+                                        section -> section //
+                                                        .attributes("date", "year", "note", "amount", "currency", "amountAfter", "currencyAfter") //
+                                                        .match("^(?<date>[\\d]{2} [\\w]{3,4}([\\.]{1})?)[\\s]$") //
+                                                        .match("^(?<year>[\\d]{4}) Kartentransaktion (?<note>.*) (?<amount>[\\.,\\d]+) (?<currency>\\p{Sc}) (?<amountAfter>[\\.,\\d]+) (?<currencyAfter>\\p{Sc})$") //
+                                                        .assign((t, v) -> {
+                                                            DocumentContext context = type.getCurrentContext();
+                                                            Money amountAfter = Money.of(asCurrencyCode(v.get("currencyAfter")), asAmount(v.get("amountAfter")));
+
+                                                            AccountAmountTransactionHelper accountAmountTransactionHelper = context.getType(AccountAmountTransactionHelper.class).orElseGet(AccountAmountTransactionHelper::new);
+                                                            Optional<AccountAmountTransactionItem> item = accountAmountTransactionHelper.findItem(v.getStartLineNumber(), amountAfter);
+
+                                                            if (item.isPresent())
+                                                            {
+                                                                Money amountBefore = Money.of(item.get().currency, item.get().amount);
+
+                                                                if (amountBefore.isGreaterThan(amountAfter))
+                                                                    t.setType(AccountTransaction.Type.REMOVAL);
+                                                            }
+
+                                                            t.setDateTime(asDate(v.get("date") + " " + v.get("year")));
+                                                            t.setAmount(asAmount(v.get("amount")));
+                                                            t.setCurrencyCode(asCurrencyCode(v.get("currency")));
+                                                            t.setNote(trim(v.get("note")));
+                                                        }),
+                                        // @formatter:off
+                                        // 30 Apr.
+                                        // 2024 Überweisung
+                                        // Einzahlung akzeptiert: DE00000000000000000000 auf
+                                        // DE00000000000000000000 1.200,00 € 18.514,32 €
+                                        // @formatter:on
+                                        section -> section //
+                                                        .attributes("date", "year", "amount", "currency") //
+                                                        .match("^(?<date>[\\d]{2} [\\w]{3,4}([\\.]{1})?)[\\s]$") //
+                                                        .match("^(?<year>[\\d]{4}) .berweisung$") //
+                                                        .match("^Einzahlung akzeptiert: .*$") //
+                                                        .match("^.* (?<amount>[\\.,\\d]+) (?<currency>\\p{Sc}) [\\.,\\d]+ \\p{Sc}$") //
+                                                        .assign((t, v) -> {
+                                                            t.setDateTime(asDate(v.get("date") + " " + v.get("year")));
+                                                            t.setAmount(asAmount(v.get("amount")));
+                                                            t.setCurrencyCode(asCurrencyCode(v.get("currency")));
+                                                        }),
+                                        // @formatter:off
+                                        // 02 Okt.
+                                        // 2023 Überweisung Einzahlung akzeptiert: DE00000000000000000000 auf DE00000000000000000000 1.200,00 € 5.427,30 €
+                                        //
+                                        // 02 Mai
+                                        // 2024 Prämie Your Saveback payment 4,94 € 18.524,98 €
+                                        // @formatter:on
+                                        section -> section //
+                                                        .attributes("date", "year", "amount", "currency") //
+                                                        .match("^(?<date>[\\d]{2} [\\w]{3,4}([\\.]{1})?)[\\s]$") //
+                                                        .match("^(?<year>[\\d]{4}) " //
+                                                                        + "(.berweisung Einzahlung akzeptiert:"
+                                                                        + "|Pr.mie Your Saveback)" //
+                                                                        + ".* (?<amount>[\\.,\\d]+) (?<currency>\\p{Sc}) [\\.,\\d]+ \\p{Sc}$") //
+                                                        .assign((t, v) -> {
+                                                            t.setDateTime(asDate(v.get("date") + " " + v.get("year")));
+                                                            t.setAmount(asAmount(v.get("amount")));
+                                                            t.setCurrencyCode(asCurrencyCode(v.get("currency")));
+                                                        }))
+
+                        .wrap(t -> {
+                            if (t.getCurrencyCode() != null && t.getAmount() != 0)
+                                return new TransactionItem(t);
+                            return null;
+                        }));
+
+        // @formatter:off
+        // 03 Apr.
+        // 024 Gebühren Trade Republic Card 5,00 € 49.997,41 €
+        // @formatter:on
+        Block feesBlock = new Block("^[\\d]{2} [\\w]{3,4}([\\.]{1})?[\\s]$");
+        type.addBlock(feesBlock);
+        feesBlock.setMaxSize(2);
+        feesBlock.set(new Transaction<AccountTransaction>()
+
+                        .subject(() -> {
+                            AccountTransaction accountTransaction = new AccountTransaction();
+                            accountTransaction.setType(AccountTransaction.Type.FEES);
+                            return accountTransaction;
+                        })
+
+                        .section("date", "year", "amount", "currency").optional() //
+                        .match("^(?<date>[\\d]{2} [\\w]{3,4}([\\.]{1})?)[\\s]$")
+                        .match("^(?<year>[\\d]{4}) Geb.hren Trade Republic Card (?<amount>[\\.,\\d]+) (?<currency>\\p{Sc}) [\\.,\\d]+ \\p{Sc}$") //
+                        .assign((t, v) -> {
+                            t.setDateTime(asDate(v.get("date") + " " + v.get("year")));
+                            t.setAmount(asAmount(v.get("amount")));
+                            t.setCurrencyCode(asCurrencyCode(v.get("currency")));
+                        })
+
+                        .wrap(t -> {
+                            if (t.getCurrencyCode() != null && t.getAmount() != 0)
+                                return new TransactionItem(t);
+                            return null;
+                        }));
+
+        // @formatter:off
+        // 01 Apr.
+        // 2024 Zinszahlung Your interest payment 147,34 € 50.152,41 €
+        // @formatter:on
+        Block interestBlock = new Block("^[\\d]{2} [\\w]{3,4}([\\.]{1})?[\\s]$");
+        type.addBlock(interestBlock);
+        interestBlock.setMaxSize(2);
+        interestBlock.set(new Transaction<AccountTransaction>()
+
+                        .subject(() -> {
+                            AccountTransaction accountTransaction = new AccountTransaction();
+                            accountTransaction.setType(AccountTransaction.Type.INTEREST);
+                            return accountTransaction;
+                        })
+
+                        .section("date", "year", "amount", "currency").optional() //
+                        .match("^(?<date>[\\d]{2} [\\w]{3,4}([\\.]{1})?)[\\s]$")
+                        .match("^(?<year>[\\d]{4}) Zinszahlung Your interest payment (?<amount>[\\.,\\d]+) (?<currency>\\p{Sc}) [\\.,\\d]+ \\p{Sc}$") //
+                        .assign((t, v) -> {
+                            t.setDateTime(asDate(v.get("date") + " " + v.get("year")));
+                            t.setAmount(asAmount(v.get("amount")));
+                            t.setCurrencyCode(asCurrencyCode(v.get("currency")));
+                        })
+
+                        .wrap(t -> {
+                            if (t.getCurrencyCode() != null && t.getAmount() != 0)
+                                return new TransactionItem(t);
+                            return null;
+                        }));
     }
 
     private void addTaxesStatementTransaction()
@@ -1793,10 +2073,15 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                                         // Limit-Order Buy on 28.04.2023 at 11:13 (Europe/Berlin).
                                         // Verkauf am 26.02.2021, um 11:44 Uhr.
                                         // Market-OrderAcquisto il 01.06.2023 alle 10:46 (Europe/Berlin) su Lang & Schwarz Exchange.
+                                        // Market-Order Achat le 10/04/2024 à 17:33 (Europe/Berlin).
                                         // @formatter:on
                                         section -> section //
                                                         .attributes("date", "time") //
-                                                        .match("^((Limit|Stop\\-Market|Market)\\-Order(\\s)?)?(Buy|Acquisto|Kauf|Verkauf) .* (?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2}))(,)? (um|at|alle) (?<time>[\\d]{2}:[\\d]{2}) .*$") //
+                                                        .match("^((Limit|Stop\\-Market|Market)\\-Order(\\s)?)?(Buy|Achat|Acquisto|Kauf|Verkauf|Sell) .* " //
+                                                                        + "(?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}" //
+                                                                        + "|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2}" //
+                                                                        + "|[\\d]{2}\\/[\\d]{2}\\/[\\d]{4}))" //
+                                                                        + "(,)? (um|at|alle|.) (?<time>[\\d]{2}:[\\d]{2}).*$") //
                                                         .assign((t, v) -> t.setDateTime(asDate(v.get("date"), v.get("time")))),
                                         // @formatter:off
                                         // Exécution de l'investissement programmé le 17/01/2022 sur le Lang & Schwarz Exchange.
@@ -1808,10 +2093,11 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                                         // @formatter:off
                                         // Sparplanausführung am 18.11.2019 an der Lang & Schwarz Exchange.
                                         // Savings plan execution on 16.05.2023 on the Lang & Schwarz Exchange.
+                                        // Saveback execution on 02.05.2024 on the Lang & Schwarz Exchange.
                                         // @formatter:on
                                         section -> section //
                                                         .attributes("date") //
-                                                        .match("^(Sparplanausf.hrung|Savings plan) .* (?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2})) .*$") //
+                                                        .match("^(Sparplanausf.hrung|(Savings plan|Saveback) execution) .* (?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2})) .*$") //
                                                         .assign((t, v) -> t.setDateTime(asDate(v.get("date")))),
                                         // @formatter:off
                                         // Ausführung von Round up am 09.02.2024 an der Lang & Schwarz Exchange.
@@ -2147,6 +2433,16 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                         })
 
                         // @formatter:off
+                        // Frais externes -1,00 EUR
+                        // @formatter:on
+                        .section("fee", "currency").optional() //
+                        .match("^Frais externes \\-(?<fee>[\\.,\\d]+) (?<currency>[\\w]{3})$") //
+                        .assign((t, v) -> {
+                            if (!type.getCurrentContext().getBoolean("negative"))
+                                processFeeEntries(t, v, type);
+                        })
+
+                        // @formatter:off
                         // Supplemento spese di terzi -1,00 EUR
                         // @formatter:on
                         .section("fee", "currency").optional() //
@@ -2165,6 +2461,48 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                             if (!type.getCurrentContext().getBoolean("negative"))
                                 processFeeEntries(t, v, type);
                         });
+    }
+
+    private static class AccountAmountTransactionItem
+    {
+        int line;
+
+        String currency;
+        long amount;
+
+        @Override
+        public String toString()
+        {
+            return "AccountTransactionItem [line=" + line + ", currency=" + currency + ", amount=" + amount + "]";
+        }
+    }
+
+    private static class AccountAmountTransactionHelper
+    {
+        private List<AccountAmountTransactionItem> items = new ArrayList<>();
+
+        // Finds an AccountAmountTransactionItem in the list that has a line
+        // number less than or equal to the specified line
+        public Optional<AccountAmountTransactionItem> findItem(Integer line, Money money)
+        {
+            if (items.isEmpty())
+                return Optional.empty();
+
+            for (int i = items.size() - 1; i >= 0; i--) // NOSONAR
+            {
+                AccountAmountTransactionItem item = items.get(i);
+
+                if (item.line > line)
+                    continue;
+
+                if (!item.currency.equals(money.getCurrencyCode()))
+                    continue;
+
+                return Optional.of(item);
+            }
+
+            return Optional.empty();
+        }
     }
 
     @Override
