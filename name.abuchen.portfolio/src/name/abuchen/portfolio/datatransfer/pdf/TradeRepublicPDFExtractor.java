@@ -1414,13 +1414,10 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
         });
         this.addDocumentTyp(type);
 
-        // @formatter:off
-        // 02 Apr. Überweisung Einzahlung akzeptiert: DE7243872432 auf 2024 DE7243872432 1.200,00 € 51.352,41 €
-        // @formatter:on
-        Block depositBlock = new Block("^[\\d]{2} [\\w]{3,4}([\\.]{1})? .berweisung Einzahlung akzeptiert:.*$");
-        type.addBlock(depositBlock);
-        depositBlock.setMaxSize(1);
-        depositBlock.set(new Transaction<AccountTransaction>()
+        Block depositRemovalBlock_Format01 = new Block("^[\\d]{2} [\\w]{3,4}([\\.]{1})?( [\\d]{4})? .berweisung .*$");
+        type.addBlock(depositRemovalBlock_Format01);
+        depositRemovalBlock_Format01.setMaxSize(1);
+        depositRemovalBlock_Format01.set(new Transaction<AccountTransaction>()
 
                         .subject(() -> {
                             AccountTransaction accountTransaction = new AccountTransaction();
@@ -1428,19 +1425,37 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                             return accountTransaction;
                         })
 
-                        .section("date", "year", "amount", "currency") //
-                        .match("^(?<date>[\\d]{2} [\\w]{3,4}([\\.]{1})?) .berweisung Einzahlung akzeptiert:.* auf (?<year>[\\d]{4}) .* (?<amount>[\\.,\\d]+) (?<currency>\\p{Sc}) [\\.,\\d]+ \\p{Sc}$") //
-                        .assign((t, v) -> {
-                            t.setDateTime(asDate(v.get("date") + " " + v.get("year")));
-                            t.setAmount(asAmount(v.get("amount")));
-                            t.setCurrencyCode(asCurrencyCode(v.get("currency")));
-                        })
+                        .oneOf( //
+                                        // @formatter:off
+                                        // 02 Apr. Überweisung Einzahlung akzeptiert: DE7243872432 auf 2024 DE7243872432 1.200,00 € 51.352,41 €
+                                        // @formatter:on
+                                        section -> section //
+                                                        .attributes("date", "year", "amount", "currency") //
+                                                        .match("^(?<date>[\\d]{2} [\\w]{3,4}([\\.]{1})?) .berweisung Einzahlung .* auf (?<year>[\\d]{4}) .* (?<amount>[\\.,\\d]+) (?<currency>\\p{Sc}) [\\.,\\d]+ \\p{Sc}$") //
+                                                        .assign((t, v) -> {
+                                                            t.setDateTime(asDate(v.get("date") + " " + v.get("year")));
+                                                            t.setAmount(asAmount(v.get("amount")));
+                                                            t.setCurrencyCode(asCurrencyCode(v.get("currency")));
+                                                        }),
+                                        // @formatter:off
+                                        // 01 Apr. 2024 Überweisung PayOut to transit 172,23 € 50.000,00 €
+                                        // @formatter:on
+                                        section -> section //
+                                                        .attributes("date", "amount", "currency") //
+                                                        .match("^(?<date>[\\d]{2} [\\w]{3,4}([\\.]{1})? [\\d]{4}) .berweisung PayOut .* (?<amount>[\\.,\\d]+) (?<currency>\\p{Sc}) [\\.,\\d]+ \\p{Sc}$") //
+                                                        .assign((t, v) -> {
+                                                            t.setType(AccountTransaction.Type.REMOVAL);
+
+                                                            t.setDateTime(asDate(v.get("date")));
+                                                            t.setAmount(asAmount(v.get("amount")));
+                                                            t.setCurrencyCode(asCurrencyCode(v.get("currency")));
+                                                        }))
 
                         .wrap(TransactionItem::new));
 
-        Block removalDepositBlock = new Block("^[\\d]{2} [\\w]{3,4}([\\.]{1})?[\\s]$");
-        type.addBlock(removalDepositBlock);
-        removalDepositBlock.set(new Transaction<AccountTransaction>()
+        Block depositRemovalBlock_Format02 = new Block("^[\\d]{2} [\\w]{3,4}([\\.]{1})?[\\s]$");
+        type.addBlock(depositRemovalBlock_Format02);
+        depositRemovalBlock_Format02.set(new Transaction<AccountTransaction>()
 
                         .subject(() -> {
                             AccountTransaction accountTransaction = new AccountTransaction();
@@ -1554,13 +1569,37 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                         }));
 
         // @formatter:off
+        // 01 Apr. 2024 Zinszahlung Your interest payment 172,23 € 50.172,23 €
+        // @formatter:on
+        Block interestBlock_Format01 = new Block("^[\\d]{2} [\\w]{3,4}([\\.]{1})? [\\d]{4} Zinszahlung .*$");
+        type.addBlock(interestBlock_Format01);
+        interestBlock_Format01.setMaxSize(1);
+        interestBlock_Format01.set(new Transaction<AccountTransaction>()
+
+                        .subject(() -> {
+                            AccountTransaction accountTransaction = new AccountTransaction();
+                            accountTransaction.setType(AccountTransaction.Type.INTEREST);
+                            return accountTransaction;
+                        })
+
+                        .section("date", "amount", "currency") //
+                        .match("^(?<date>[\\d]{2} [\\w]{3,4}([\\.]{1})? [\\d]{4}) Zinszahlung .* (?<amount>[\\.,\\d]+) (?<currency>\\p{Sc}) [\\.,\\d]+ \\p{Sc}$") //
+                        .assign((t, v) -> {
+                            t.setDateTime(asDate(v.get("date")));
+                            t.setAmount(asAmount(v.get("amount")));
+                            t.setCurrencyCode(asCurrencyCode(v.get("currency")));
+                        })
+
+                        .wrap(TransactionItem::new));
+
+        // @formatter:off
         // 01 Apr.
         // 2024 Zinszahlung Your interest payment 147,34 € 50.152,41 €
         // @formatter:on
-        Block interestBlock = new Block("^[\\d]{2} [\\w]{3,4}([\\.]{1})?[\\s]$");
-        type.addBlock(interestBlock);
-        interestBlock.setMaxSize(2);
-        interestBlock.set(new Transaction<AccountTransaction>()
+        Block interestBlock_Format02 = new Block("^[\\d]{2} [\\w]{3,4}([\\.]{1})?[\\s]$");
+        type.addBlock(interestBlock_Format02);
+        interestBlock_Format02.setMaxSize(2);
+        interestBlock_Format02.set(new Transaction<AccountTransaction>()
 
                         .subject(() -> {
                             AccountTransaction accountTransaction = new AccountTransaction();
@@ -1762,15 +1801,6 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                         })
 
                         // @formatter:off
-                        // zum 31.01.2023
-                        // alla data 31.05.2023
-                        // as of 30.09.2023
-                        // @formatter:on
-                        .section("date") //
-                        .match("^(zum|alla data|as of) (?<date>[\\d]{2}\\.[\\d]{2}\\.[\\d]{4})$") //
-                        .assign((t, v) -> t.setDateTime(asDate(v.get("date"))))
-
-                        // @formatter:off
                         // IBAN BUCHUNGSDATUM GUTSCHRIFT NACH STEUERN
                         // DE10123456789123456789 01.02.2023 0,88 EUR
                         //
@@ -1780,10 +1810,11 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                         // IBAN BOOKING DATE TOTAL
                         // DE27502109007011534672 02.10.2023 1,47 EUR
                         // @formatter:on
-                        .section("currency", "amount") //
+                        .section("date", "amount", "currency") //
                         .find("IBAN (BUCHUNGSDATUM|DATA EMISSIONE|BOOKING DATE) (GUTSCHRIFT NACH STEUERN|TOTALE|TOTAL)") //
-                        .match("^.* [\\d]{2}\\.[\\d]{2}\\.[\\d]{4} (?<amount>[\\.,\\d]+) (?<currency>[\\w]{3})$") //
+                        .match("^.* (?<date>[\\d]{2}\\.[\\d]{2}\\.[\\d]{4}) (?<amount>[\\.,\\d]+) (?<currency>[\\w]{3})$") //
                         .assign((t, v) -> {
+                            t.setDateTime(asDate(v.get("date")));
                             t.setAmount(asAmount(v.get("amount")));
                             t.setCurrencyCode(asCurrencyCode(v.get("currency")));
                         })
