@@ -14,6 +14,7 @@ import java.util.stream.LongStream;
 import name.abuchen.portfolio.math.AllTimeHigh;
 import name.abuchen.portfolio.math.Risk.Drawdown;
 import name.abuchen.portfolio.math.Risk.Volatility;
+import name.abuchen.portfolio.model.ClientProperties;
 import name.abuchen.portfolio.model.Dashboard;
 import name.abuchen.portfolio.model.Dashboard.Widget;
 import name.abuchen.portfolio.model.Security;
@@ -175,6 +176,36 @@ public enum WidgetFactory
                                     }) //
                                     .withTooltip((ds, period) -> Messages.TooltipVolatility) //
                                     .withColoredValues(false) //
+                                    .build()),
+
+    SHARPE_RATIO(Messages.LabelSharpeRatio, Messages.LabelRiskIndicators, //
+                    (widget, data) -> IndicatorWidget.<Double>create(widget, data) //
+                                    .with(Values.PercentPlain) //
+                                    .withColoredValues(false) //
+                                    .withConfig(delegate -> new RiskFreeRateOfReturnConfig(delegate)) //
+                                    .with((ds, period) -> {
+                                        PerformanceIndex index = data.calculate(ds, period);
+                                        double r = index.getPerformanceIRR();
+                                        double rf = new ClientProperties(data.getClient()).getRiskFreeRateOfReturn();
+                                        double volatility = index.getVolatility().getStandardDeviation();
+
+                                        // handle invalid rf value
+                                        if (Double.isNaN(rf))
+                                            return Double.NaN;
+
+                                        double excessReturn = r - rf;
+                                        return excessReturn / volatility;
+                                    }) //
+                                    .withTooltip((ds, period) -> {
+                                        PerformanceIndex index = data.calculate(ds, period);
+                                        double r = index.getPerformanceIRR();
+                                        double rf = new ClientProperties(data.getClient()).getRiskFreeRateOfReturn();
+                                        double volatility = index.getVolatility().getStandardDeviation();
+                                        double sharpeRatio = (r - rf) / volatility;
+                                        return MessageFormat.format(Messages.TooltipSharpeRatio,
+                                                        Values.Percent5.format(r), Values.Percent2.format(rf),
+                                                        volatility, sharpeRatio);
+                                    }) //
                                     .build()),
 
     SEMIVOLATILITY(Messages.LabelSemiVolatility, Messages.LabelRiskIndicators, //

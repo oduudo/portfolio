@@ -605,6 +605,7 @@ public class Messages extends NLS
     public static String LabelColumns;
     public static String LabelColumnsInReverseOrder;
     public static String LabelCommon;
+    public static String LabelConfigureSharpeRatioRisklessIRR;
     public static String LabelConsumerPriceIndex;
     public static String LabelConvertBuySellIntoDeliveryTransactions;
     public static String LabelCopyToClipboard;
@@ -782,6 +783,7 @@ public class Messages extends NLS
     public static String LabelSelectYearSince;
     public static String LabelSaleTransactionsOnly;
     public static String LabelSemiVolatility;
+    public static String LabelSharpeRatio;
     public static String LabelSettings;
     public static String LabelShowOnlyOneYear;
     public static String LabelShowRawResponse;
@@ -1257,6 +1259,7 @@ public class Messages extends NLS
     public static String SecurityTabHistoricalQuotes;
     public static String SecurityTabTrades;
     public static String SecurityTabTransactions;
+    public static String SharpeRatioRisklessIRR;
     public static String SiteAppLandingpage;
     public static String SiteNewAndNoteworthy;
     public static String SplitWizardDefinitionDescription;
@@ -1294,6 +1297,7 @@ public class Messages extends NLS
     public static String TooltipRebalancingIndicator;
     public static String TooltipSecurityLatestPrice;
     public static String TooltipSemiVolatility;
+    public static String TooltipSharpeRatio;
     public static String TooltipTurnoverRate;
     public static String TooltipVolatility;
     public static String TransactionFilter;
