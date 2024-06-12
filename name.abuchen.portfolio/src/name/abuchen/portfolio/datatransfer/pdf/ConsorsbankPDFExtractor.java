@@ -29,7 +29,7 @@ public class ConsorsbankPDFExtractor extends AbstractPDFExtractor
     private static final String IS_JOINT_ACCOUNT = "isJointAccount";
 
     BiConsumer<DocumentContext, String[]> isJointAccount = (context, lines) -> {
-        Pattern pJointAccount = Pattern.compile("^.*(?i)(Kapitalertragssteuer|KAPST) ([\\s]+)?(anteilig|ANTEILIG) [\\d]{2},[\\d]{2}.*$");
+        Pattern pJointAccount = Pattern.compile("^(?i).*(Kapitalertragssteuer|KAPST) ([\\s]+)?(anteilig|ANTEILIG) [\\d]{2},[\\d]{2}.*$");
 
         for (String line : lines)
         {
@@ -74,7 +74,7 @@ public class ConsorsbankPDFExtractor extends AbstractPDFExtractor
 
         Transaction<BuySellEntry> pdfTransaction = new Transaction<>();
 
-        Block firstRelevantLine = new Block("^.*(?i)(Kauf" //
+        Block firstRelevantLine = new Block("^(?i).*(Kauf" //
                         + "|Bezug" //
                         + "|Verkauf" //
                         + "|VERK\\. TEIL\\-\\/BEZUGSR\\." //
@@ -91,15 +91,16 @@ public class ConsorsbankPDFExtractor extends AbstractPDFExtractor
                         })
 
                         // Is type --> "VERKAUF" change from BUY to SELL
-                        .section("type").optional().match("^(?i).*(?<type>Verkauf" //
+                        .section("type").optional() //
+                        .match("^(?i).*(?<type>Verkauf" //
                                         + "|VERK\\. TEIL\\-\\/BEZUGSR\\." //
                                         + "|VERKAUF KAPITALMA.*)[\\s]{1,}AM .*$")
                         .assign((t, v) -> {
-                            if ("VERKAUF".equals(v.get("type")) //
-                                            || "Verkauf".equals(v.get("type")) //
-                                            || "VERK. TEIL-/BEZUGSR.".equals(v.get("type")) //
-                                            || "VERKAUF KAPITALMAßN.".equals(v.get("type")) //
-                                            || "VERKAUF KAPITALMASSN.".equals(v.get("type")))
+                            if ("VERKAUF".equalsIgnoreCase(v.get("type")) //
+                                            || "Verkauf".equalsIgnoreCase(v.get("type")) //
+                                            || "VERK. TEIL-/BEZUGSR.".equalsIgnoreCase(v.get("type")) //
+                                            || "VERKAUF KAPITALMAßN.".equalsIgnoreCase(v.get("type")) //
+                                            || "VERKAUF KAPITALMASSN.".equalsIgnoreCase(v.get("type")))
                             {
                                 t.setType(PortfolioTransaction.Type.SELL);
                             }
@@ -364,7 +365,14 @@ public class ConsorsbankPDFExtractor extends AbstractPDFExtractor
                             t.setNote(concatenate(t.getNote(), trim(v.get("note2")), " "));
                         })
 
-                        .wrap(BuySellEntryItem::new);
+                        .wrap((t) -> {
+                            BuySellEntryItem item = new BuySellEntryItem(t);
+
+                            if (t.getPortfolioTransaction().getCurrencyCode() != null && t.getPortfolioTransaction().getAmount() == 0)
+                                item.setFailureMessage(Messages.MsgErrorTransactionTypeNotSupported);
+
+                            return item;
+                        });
 
         addTaxesSectionsTransaction(pdfTransaction, type);
         addFeesSectionsTransaction(pdfTransaction, type);
