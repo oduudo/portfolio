@@ -415,6 +415,8 @@ public class Messages extends NLS
     public static String EventWizardDescription;
     public static String EventWizardLabelMessage;
     public static String EventWizardTitle;
+    public static String ExperimentalColumnExpectedDividends;
+    public static String ExperimentalColumnExpectedDividends_MenuLabel;
     public static String ExportWizardAccountTransactions;
     public static String ExportWizardAllTransactionsAktienfreundeNet;
     public static String ExportWizardCurrencyConversionQuotes;
@@ -532,6 +534,7 @@ public class Messages extends NLS
     public static String LabelAllSecurities;
     public static String LabelAllTrades;
     public static String LabelAllTransactions;
+    public static String LabelAspect;
     public static String LabelAssetChart;
     public static String LabelAutomaticDarkLightTheme;
     public static String LabelAvailableAttributes;
@@ -599,6 +602,7 @@ public class Messages extends NLS
     public static String LabelClientFilterDialogTitle;
     public static String LabelClientFilterEditTooltip;
     public static String LabelClientFilterManage;
+    public static String LabelClientFilterMenu;
     public static String LabelClientFilterNew;
     public static String LabelClientFilterNoCustomFilterExisting;
     public static String LabelClose;
@@ -836,6 +840,7 @@ public class Messages extends NLS
     public static String LabelSmallerSize;
     public static String LabelStartTyping;
     public static String LabelStatementOfAssets;
+    public static String LabelStatementOfAssetsDerivedDataSeries;
     public static String LabelStatementOfAssetsHistory;
     public static String LabelStatementOfAssetsHoldings;
     public static String LabelSuffix_HICP;
