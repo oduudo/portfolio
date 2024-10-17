@@ -1171,6 +1171,7 @@ public class Messages extends NLS
     public static String PrefNoteStoreSettingsNextToFile;
     public static String PrefPortfolioReportAPIKey;
     public static String PrefPortfolioReportAPIURL;
+    public static String PrefPrefixSecurityName;
     public static String PrefQuandlAPIKey;
     public static String PrefRelativeBackupDirectoryName;
     public static String PrefStoreSettingsNextToFile;
