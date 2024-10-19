@@ -27,6 +27,7 @@ import name.abuchen.portfolio.model.Transaction;
 import name.abuchen.portfolio.model.Transaction.Unit;
 import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.util.AdditionalLocales;
 
 @SuppressWarnings("nls")
 public class ExtractorUtils
@@ -115,7 +116,9 @@ public class ExtractorUtils
     // Date formatters with case-insensitive support for Canada
     private static final DateTimeFormatter[] DATE_FORMATTER_CANADA = { //
                     createFormatter("LLL d, yyyy", Locale.CANADA), //
-                    createFormatter("LLL dd, yyyy", Locale.CANADA) };
+                    createFormatter("LLL. d, yyyy", Locale.CANADA), //
+                    createFormatter("LLL dd, yyyy", Locale.CANADA), //
+                    createFormatter("LLL. dd, yyyy", Locale.CANADA) };
 
     // Date formatters with case-insensitive support for Canadian French
     private static final DateTimeFormatter[] DATE_FORMATTER_CANADA_FRENCH = { //
@@ -124,17 +127,17 @@ public class ExtractorUtils
 
     // Date formatters with case-insensitive support for Spanish (Spain)
     private static final DateTimeFormatter[] DATE_FORMATTER_SPAIN = {
-                    createFormatter("d MMM yyyy", new Locale("es", "ES")),
-                    createFormatter("dd MMM yyyy", new Locale("es", "ES")),
-                    createFormatter("d MMMM yyyy", new Locale("es", "ES")),
-                    createFormatter("dd MMMM yyyy", new Locale("es", "ES")) };
+                    createFormatter("d MMM yyyy", AdditionalLocales.SPAIN),
+                    createFormatter("dd MMM yyyy", AdditionalLocales.SPAIN),
+                    createFormatter("d MMMM yyyy", AdditionalLocales.SPAIN),
+                    createFormatter("dd MMMM yyyy", AdditionalLocales.SPAIN) };
 
     // Date formatters with case-insensitive support for Spanish (Mexico)
     private static final DateTimeFormatter[] DATE_FORMATTER_MEXICO = {
-                    createFormatter("d MMM yyyy", new Locale("es", "MX")),
-                    createFormatter("dd MMM yyyy", new Locale("es", "MX")),
-                    createFormatter("d MMMM yyyy", new Locale("es", "MX")),
-                    createFormatter("dd MMMM yyyy", new Locale("es", "MX")) };
+                    createFormatter("d MMM yyyy", AdditionalLocales.MEXICO),
+                    createFormatter("dd MMM yyyy", AdditionalLocales.MEXICO),
+                    createFormatter("d MMMM yyyy", AdditionalLocales.MEXICO),
+                    createFormatter("dd MMMM yyyy", AdditionalLocales.MEXICO) };
 
     // Date formatters with case-insensitive support for the United Kingdom
     private static final DateTimeFormatter[] DATE_FORMATTER_UK = { //
@@ -161,8 +164,8 @@ public class ExtractorUtils
                     Locale.CANADA, DATE_FORMATTER_CANADA, //
                     Locale.CANADA_FRENCH, DATE_FORMATTER_CANADA_FRENCH, //
                     Locale.UK, DATE_FORMATTER_UK, //
-                    new Locale("es", "ES"), DATE_FORMATTER_SPAIN, //
-                    new Locale("es", "MX"), DATE_FORMATTER_MEXICO);
+                    AdditionalLocales.SPAIN, DATE_FORMATTER_SPAIN, //
+                    AdditionalLocales.MEXICO, DATE_FORMATTER_MEXICO);
 
     // DateTime formatters with case-insensitive support for various locales
     private static final DateTimeFormatter[] DATE_TIME_FORMATTER = { //
@@ -293,7 +296,8 @@ public class ExtractorUtils
 
     public static long convertToNumberLong(String value, Values<Long> valueType, String language, String country)
     {
-        DecimalFormat newNumberFormat = (DecimalFormat) NumberFormat.getInstance(new Locale(language, country));
+        DecimalFormat newNumberFormat = (DecimalFormat) NumberFormat
+                        .getInstance(Locale.forLanguageTag(language + "-" + country));
 
         /**
          * @formatter:off
@@ -365,7 +369,8 @@ public class ExtractorUtils
          */
         value = trim(value).replaceAll("\\s", "");
 
-        DecimalFormat newNumberFormat = (DecimalFormat) NumberFormat.getInstance(new Locale(language, country));
+        DecimalFormat newNumberFormat = (DecimalFormat) NumberFormat
+                        .getInstance(Locale.forLanguageTag(language + "-" + country));
 
         if ("CH".equals(country))
         {
@@ -405,7 +410,7 @@ public class ExtractorUtils
 
         Locale[] locales = hints.length > 0 ? hints
                         : new Locale[] { Locale.GERMANY, Locale.FRENCH, Locale.US, Locale.CANADA, Locale.CANADA_FRENCH,
-                                        Locale.UK, new Locale("es", "ES"), new Locale("es", "MX") };
+                                        Locale.UK, AdditionalLocales.SPAIN, AdditionalLocales.MEXICO };
 
         for (Locale l : locales)
         {
