@@ -25,10 +25,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.swtchart.IAxis;
-import org.swtchart.ILineSeries;
-import org.swtchart.ILineSeries.PlotSymbolType;
-import org.swtchart.ISeries;
+import org.eclipse.swtchart.IAxis;
+import org.eclipse.swtchart.ILineSeries.PlotSymbolType;
 
 import com.google.common.collect.Lists;
 
@@ -259,7 +257,7 @@ public class ReturnsVolatilityChartView extends AbstractHistoricView
 
             chart.suspendUpdate(true);
             chart.getTitle().setText(getTitle());
-            for (ISeries s : chart.getSeriesSet().getSeries())
+            for (var s : chart.getSeriesSet().getSeries())
                 chart.getSeriesSet().deleteSeries(s.getId());
 
             setChartSeries();
@@ -290,8 +288,8 @@ public class ReturnsVolatilityChartView extends AbstractHistoricView
             if (Double.isInfinite(risk) || Double.isInfinite(retrn))
                 return;
 
-            ILineSeries lineSeries = chart.addScatterSeries(series.getUUID(), new double[] { risk },
-                            new double[] { retrn }, series.getLabel());
+            var lineSeries = chart.addScatterSeries(series.getUUID(), new double[] { risk }, new double[] { retrn },
+                            series.getLabel());
 
             Color color = resources.createColor(series.getColor());
             lineSeries.setLineColor(color);

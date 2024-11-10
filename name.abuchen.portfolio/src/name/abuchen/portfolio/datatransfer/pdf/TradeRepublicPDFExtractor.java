@@ -79,7 +79,7 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
         Transaction<BuySellEntry> pdfTransaction = new Transaction<>();
 
-        Block firstRelevantLine = new Block("^TRADE REPUBLIC BANK GMBH .*$");
+        Block firstRelevantLine = new Block("^TRADE REPUBLIC BANK GMBH.*$");
         type.addBlock(firstRelevantLine);
         firstRelevantLine.set(pdfTransaction);
 
@@ -843,12 +843,12 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
     private void addBuySellCryptoTransaction()
     {
-        DocumentType type = new DocumentType("(ABRECHNUNG CRYPTOGESCH.FT|CRYPTO SPARPLAN)");
+        DocumentType type = new DocumentType("(ABRECHNUNG CRYPTOGESCH.FT|CRYPTO SPARPLAN|ABRECHNUNG CRYPTO SAVEBACK)");
         this.addDocumentTyp(type);
 
         Transaction<BuySellEntry> pdfTransaction = new Transaction<>();
 
-        Block firstRelevantLine = new Block("^TRADE REPUBLIC BANK GMBH .*$");
+        Block firstRelevantLine = new Block("^TRADE REPUBLIC BANK GMBH.*$", "^Diese Abrechnung wird maschinell erstellt.*$");
         type.addBlock(firstRelevantLine);
         firstRelevantLine.set(pdfTransaction);
 
@@ -900,10 +900,11 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                                                         .assign((t, v) -> t.setDate(asDate(v.get("date"), v.get("time")))),
                                         // @formatter:off
                                         // Sparplanausführung am 16.05.2023 im außerbörslichen Handel Bankhaus Scheich.
+                                        // Saveback Ausführung am 02.09.2024 im außerbörslichen Handel Bankhaus Scheich.
                                         // @formatter:on
                                         section -> section //
                                                         .attributes("date") //
-                                                        .match("^Sparplanausf.hrung .* (?<date>[\\d]{2}\\.[\\d]{2}\\.[\\d]{4}) .*$") //
+                                                        .match("^(Sparplanausf.hrung|Saveback) .* (?<date>[\\d]{2}\\.[\\d]{2}\\.[\\d]{4}) .*$") //
                                                         .assign((t, v) -> t.setDate(asDate(v.get("date")))))
 
                         .oneOf( //
@@ -1052,7 +1053,7 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
         Transaction<AccountTransaction> pdfTransaction = new Transaction<>();
 
-        Block firstRelevantLine = new Block("^TRADE REPUBLIC BANK GMBH .*$"); //
+        Block firstRelevantLine = new Block("^TRADE REPUBLIC BANK GMBH.*$"); //
         type.addBlock(firstRelevantLine);
         firstRelevantLine.set(pdfTransaction);
 
@@ -2527,9 +2528,13 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                                         //
                                         // VERRECHNUNGSKONTO DATUM DER ZAHLUNG BETRAG
                                         // DE12345678912345678912 28.09.2024 -0.27 EUR
+                                        //
+                                        // IBAN BUCHUNGSDATUM GESAMT
+                                        // DE12321546856552266333 01.07.2024 74,08 EUR
+                                        //
                                         // @formatter:on
                                         .section("date") //
-                                        .find("(IBAN BUCHUNGSDATUM GUTSCHRIFT NACH STEUERN|VERRECHNUNGSKONTO (VALUTA|WERTSTELLUNG|DATUM DER ZAHLUNG) BETRAG)") //
+                                        .find("(IBAN BUCHUNGSDATUM (GUTSCHRIFT NACH STEUERN|GESAMT)|VERRECHNUNGSKONTO (VALUTA|WERTSTELLUNG|DATUM DER ZAHLUNG) BETRAG)") //
                                         .match("^.* (?<date>[\\d]{2}\\.[\\d]{2}\\.[\\d]{4}) (\\-)?[\\.,\\d]+( [\\w]{3})?$") //
                                         .assign((ctx, v) -> {
                                             ctx.put("date", v.get("date"));
@@ -2812,7 +2817,7 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
         Transaction<AccountTransaction> pdfTransaction = new Transaction<>();
 
-        Block firstRelevantLine = new Block("^TRADE REPUBLIC BANK GMBH .*$");
+        Block firstRelevantLine = new Block("^TRADE REPUBLIC BANK GMBH.*$");
         type.addBlock(firstRelevantLine);
         firstRelevantLine.set(pdfTransaction);
 
@@ -2882,11 +2887,16 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                         + "|INTEREST INVOICE)", //
                         documentContext -> documentContext //
                                         // @formatter:off
+                                        //
                                         // IBAN BUCHUNGSDATUM GUTSCHRIFT NACH STEUERN
                                         // DE10123456789123456789 01.02.2023 0,88 EUR
+                                        //
+                                        // IBAN BUCHUNGSDATUM GESAMT
+                                        // DE12321546856552266333 01.07.2024 74,08 EUR
+                                        //
                                         // @formatter:on
                                         .section("date") //
-                                        .find("IBAN (BUCHUNGSDATUM|DATA EMISSIONE|BOOKING DATE) (GUTSCHRIFT NACH STEUERN|TOTALE|TOTAL)") //
+                                        .find("IBAN (BUCHUNGSDATUM|DATA EMISSIONE|BOOKING DATE) (GUTSCHRIFT NACH STEUERN|GESAMT|TOTALE|TOTAL)") //
                                         .match("^.* (?<date>[\\d]{2}\\.[\\d]{2}\\.[\\d]{4}) [\\.,\\d]+ [\\w]{3}$") //
                                         .assign((ctx, v) -> {
                                             ctx.put("date", v.get("date"));
@@ -3101,7 +3111,7 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
         Transaction<AccountTransaction> pdfTransaction = new Transaction<>();
 
-        Block firstRelevantLine = new Block("^TRADE REPUBLIC BANK GMBH .*$");
+        Block firstRelevantLine = new Block("^TRADE REPUBLIC BANK GMBH.*$");
         type.addBlock(firstRelevantLine);
         firstRelevantLine.set(pdfTransaction);
 
@@ -3268,7 +3278,7 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
     {
         Transaction<AccountTransaction> pdfTransaction = new Transaction<>();
 
-        Block firstRelevantLine = new Block("^TRADE REPUBLIC BANK GMBH .*$");
+        Block firstRelevantLine = new Block("^TRADE REPUBLIC BANK GMBH.*$");
         type.addBlock(firstRelevantLine);
         firstRelevantLine.set(pdfTransaction);
 
@@ -3565,7 +3575,7 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
     {
         Transaction<AccountTransaction> pdfTransaction = new Transaction<>();
 
-        Block firstRelevantLine = new Block("^TRADE REPUBLIC BANK GMBH .*$");
+        Block firstRelevantLine = new Block("^TRADE REPUBLIC BANK GMBH.*$");
         type.addBlock(firstRelevantLine);
         firstRelevantLine.set(pdfTransaction);
 
@@ -3983,6 +3993,13 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                         // @formatter:on
                         .section("tax", "currency").optional() //
                         .match("^.* Finanztransaktionssteuer (\\-)?(?<tax>[\\.,\\d]+) (?<currency>[\\w]{3})$") //
+                        .assign((t, v) -> processTaxEntries(t, v, type))
+
+                        // @formatter:off
+                        // Finanztransaktionssteuer -0,08 EUR
+                        // @formatter:on
+                        .section("tax", "currency").optional() //
+                        .match("^Finanztransaktionssteuer (\\-)?(?<tax>[\\.,\\d]+) (?<currency>[\\w]{3})$") //
                         .assign((t, v) -> processTaxEntries(t, v, type));
     }
 
