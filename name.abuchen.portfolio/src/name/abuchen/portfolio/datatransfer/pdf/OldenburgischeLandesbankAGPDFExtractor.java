@@ -1,6 +1,7 @@
 package name.abuchen.portfolio.datatransfer.pdf;
 
 import static name.abuchen.portfolio.datatransfer.ExtractorUtils.checkAndSetGrossUnit;
+import static name.abuchen.portfolio.util.TextUtil.concatenate;
 import static name.abuchen.portfolio.util.TextUtil.trim;
 
 import name.abuchen.portfolio.Messages;
@@ -137,10 +138,18 @@ public class OldenburgischeLandesbankAGPDFExtractor extends AbstractPDFExtractor
 
                         // @formatter:off
                         // Orderreferenz 100000
+                        // hZiVsq-ayrsK-DSa. 98 Ausführung 15.11.2024Orderreferenz 4359234
                         // @formatter:on
                         .section("note").optional() //
-                        .match("^Orderreferenz (?<note>.*)$") //
+                        .match("^.*Orderreferenz (?<note>.*)$") //
                         .assign((t, v) -> t.setNote("Ord.-Ref.: " + v.get("note")))
+
+                        // @formatter:off
+                        // 23986 dUmJRYi Handelsreferenz 4237898
+                        // @formatter:on
+                        .section("note").optional() //
+                        .match("^.*Handelsreferenz (?<note>.*)$") //
+                        .assign((t, v) -> t.setNote(concatenate(t.getNote(), trim(v.get("note")), " | Handels.-Ref.: ")))
 
                         .wrap((t, ctx) -> {
                             BuySellEntryItem item = new BuySellEntryItem(t);
@@ -152,6 +161,7 @@ public class OldenburgischeLandesbankAGPDFExtractor extends AbstractPDFExtractor
                         });
 
         addFeesSectionsTransaction(pdfTransaction, type);
+        addTaxesSectionsTransaction(pdfTransaction, type);
     }
 
     private void addDividendeTransaction()
@@ -319,9 +329,6 @@ public class OldenburgischeLandesbankAGPDFExtractor extends AbstractPDFExtractor
 
                             return item;
                         });
-
-        addTaxesSectionsTransaction(pdfTransaction, type);
-        addFeesSectionsTransaction(pdfTransaction, type);
     }
 
     private void addAccountStatementTransaction()
@@ -333,14 +340,22 @@ public class OldenburgischeLandesbankAGPDFExtractor extends AbstractPDFExtractor
                                         // @formatter:on
                                         .section("currency") //
                                         .match("^Alter Saldo.* (?<currency>[\\w]{3}).*$") //
-                                        .assign((ctx, v) -> ctx.put("currency", asCurrencyCode(v.get("currency")))));
+                                        .assign((ctx, v) -> ctx.put("currency", asCurrencyCode(v.get("currency"))))
+
+                                        // @formatter:off
+                                        // Rechnungsabschluss per 30.09.2024
+                                        // @formatter:on
+                                        .section("year").optional() //
+                                        .match("^Rechnungsabschluss per [\\d]{2}\\.[\\d]{2}\\.(?<year>[\\d]{4}).*$") //
+                                        .assign((ctx, v) -> ctx.put("year", v.get("year"))));
 
         this.addDocumentTyp(type);
 
-        // @formatter:off
-        // 03.08.23 03.08. CORE-LA-EV   EINGANG VORBEHALTEN                      10,00+
-        // @formatter:on
-        Block depositRemovalBlock = new Block("^[\\d]{2}\\.[\\d]{2}\\.[\\d]{2} [\\d]{2}\\.[\\d]{2}\\. .* EINGANG VORBEHALTEN.* [\\.,\\d]+[\\+|\\-].*$");
+        Block depositRemovalBlock = new Block("^[\\d]{2}\\.[\\d]{2}\\.([\\d]{2})? [\\d]{2}\\.[\\d]{2}\\. "
+                        + "(.* EINGANG VORBEHALTEN"
+                        + "|DA\\-GUTSCHR"
+                        + "|GUTSCHRIFT)"
+                        + "[\\s]{1,}[\\.,\\d]+[\\+|\\-].*$");
         type.addBlock(depositRemovalBlock);
         depositRemovalBlock.set(new Transaction<AccountTransaction>()
 
@@ -350,18 +365,53 @@ public class OldenburgischeLandesbankAGPDFExtractor extends AbstractPDFExtractor
                             return accountTransaction;
                         })
 
-                        .section("year", "date", "amount", "type") //
-                        .documentContext("currency") //
-                        .match("^[\\d]{2}\\.[\\d]{2}\\.(?<year>[\\d]{2}) (?<date>[\\d]{2}\\.[\\d]{2}\\.) .* EINGANG VORBEHALTEN.* (?<amount>[\\.,\\d]+)(?<type>[\\+|\\-]).*$") //
-                        .assign((t, v) -> {
-                            // Is type is "-" change from DEPOSIT to REMOVAL
-                            if ("-".equals(trim(v.get("type"))))
-                                t.setType(AccountTransaction.Type.REMOVAL);
+                        .oneOf( //
+                                        // @formatter:off
+                                        // 03.08.23 03.08. CORE-LA-EV   EINGANG VORBEHALTEN                      10,00+
+                                        // 02.09.24 02.09. DA-GUTSCHR                                           100,00+
+                                        // 30.09.24 30.09. GUTSCHRIFT                                           200,00+
+                                        // @formatter:on
+                                        section -> section //
+                                                        .attributes("year", "date", "amount", "type") //
+                                                        .documentContext("currency") //
+                                                        .match("^[\\d]{2}\\.[\\d]{2}\\.(?<year>[\\d]{2}) (?<date>[\\d]{2}\\.[\\d]{2}\\.) "
+                                                                        + "(.* EINGANG VORBEHALTEN"
+                                                                        + "|DA\\-GUTSCHR"
+                                                                        + "|GUTSCHRIFT)"
+                                                                        + "[\\s]{1,}(?<amount>[\\.,\\d]+)(?<type>[\\+|\\-]).*$") //
+                                                        .assign((t, v) -> {
+                                                            // @formatter:off
+                                                            // Is type is "-" change from DEPOSIT to REMOVAL
+                                                            // @formatter:on
+                                                            if ("-".equals(trim(v.get("type"))))
+                                                                t.setType(AccountTransaction.Type.REMOVAL);
 
-                            t.setDateTime(asDate(v.get("date") + v.get("year")));
-                            t.setCurrencyCode(v.get("currency"));
-                            t.setAmount(asAmount(v.get("amount")));
-                        })
+                                                            t.setDateTime(asDate(v.get("date") + v.get("year")));
+                                                            t.setCurrencyCode(v.get("currency"));
+                                                            t.setAmount(asAmount(v.get("amount")));
+                                                        }),
+                                        // @formatter:off
+                                        // 01.10. 01.10. DA-GUTSCHR                                             200,00+
+                                        // 04.10. 04.10. CORE-LA-EV   EINGANG VORBEHALTEN                        25,00+
+                                        // @formatter:on
+                                        section -> section //
+                                                        .attributes("date", "amount", "type") //
+                                                        .documentContext("currency", "year") //
+                                                        .match("^[\\d]{2}\\.[\\d]{2}\\. (?<date>[\\d]{2}\\.[\\d]{2}\\.) "
+                                                                        + "(.* EINGANG VORBEHALTEN" + "|DA\\-GUTSCHR"
+                                                                        + "|GUTSCHRIFT)"
+                                                                        + "[\\s]{1,}(?<amount>[\\.,\\d]+)(?<type>[\\+|\\-]).*$") //
+                                                        .assign((t, v) -> {
+                                                            // @formatter:off
+                                                            // Is type is "-" change from DEPOSIT to REMOVAL
+                                                            // @formatter:on
+                                                            if ("-".equals(trim(v.get("type"))))
+                                                                t.setType(AccountTransaction.Type.REMOVAL);
+
+                                                            t.setDateTime(asDate(v.get("date") + v.get("year")));
+                                                            t.setCurrencyCode(v.get("currency"));
+                                                            t.setAmount(asAmount(v.get("amount")));
+                                                        }))
 
                         .wrap(TransactionItem::new));
     }
@@ -431,23 +481,26 @@ public class OldenburgischeLandesbankAGPDFExtractor extends AbstractPDFExtractor
 
                         // @formatter:off
                         // Kapitalertragsteuer 1,40 EUR
+                        // Kapitalertragsteuer: 251,13 EUR
                         // @formatter:on
                         .section("tax", "currency").optional()
-                        .match("Kapitalertrags(s)?teuer (?<tax>[\\.,\\d]+) (?<currency>[\\w]{3})$")
+                        .match("^Kapitalertrags(s)?teuer(:)? (?<tax>[\\.,\\d]+) (?<currency>[\\w]{3})$")
                         .assign((t, v) -> processTaxEntries(t, v, type))
 
                         // @formatter:off
                         // Solidaritätszuschlag 0,07 EUR
+                        // Solidaritätszuschlag: 13,81 EUR
                         // @formatter:on
                         .section("tax", "currency").optional()
-                        .match("^Solidarit.tszuschlag (?<tax>[\\.,\\d]+) (?<currency>[\\w]{3})$")
+                        .match("^Solidarit.tszuschlag(:)? (?<tax>[\\.,\\d]+) (?<currency>[\\w]{3})$")
                         .assign((t, v) -> processTaxEntries(t, v, type))
 
                         // @formatter:off
                         // Kirchensteuer 0,00 EUR
+                        // Kirchensteuer: 0,00 EUR
                         // @formatter:on
                         .section("tax", "currency").optional()
-                        .match("^Kirchensteuer (?<tax>[\\.,\\d]+) (?<currency>[\\w]{3})$")
+                        .match("^Kirchensteuer(:)? (?<tax>[\\.,\\d]+) (?<currency>[\\w]{3})$")
                         .assign((t, v) -> processTaxEntries(t, v, type));
     }
 
