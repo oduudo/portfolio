@@ -426,6 +426,7 @@ public class Messages extends NLS
     public static String EditWizardQuoteFeedTitle;
     public static String EODHistoricalDataMissingAPIKey;
     public static String ErrorKeyAlreadyUsed;
+    public static String EventListWidgetTitle;
     public static String EventWizardDescription;
     public static String EventWizardLabelMessage;
     public static String EventWizardTitle;
@@ -1062,6 +1063,7 @@ public class Messages extends NLS
     public static String MsgErrorTradeCollectionWithErrors;
     public static String MsgErrorUpdating;
     public static String MsgHintNoAttributesConfigured;
+    public static String MsgHintNoEvents;
     public static String MsgHintUseOutboundDeliveryForZeroTotal;
     public static String MsgIncorrectConvertedSubTotal;
     public static String MsgIncorrectSubTotal;
