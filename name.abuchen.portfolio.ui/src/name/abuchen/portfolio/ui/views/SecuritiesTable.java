@@ -155,6 +155,7 @@ public final class SecuritiesTable implements ModificationListener
                 else
                 {
                     security.setOnlineId(onlineId);
+                    security.getEphemeralData().touchFeedConfigurationChanged();
                     PortfolioReportNet.updateWith(security, result.get());
                 }
             }
