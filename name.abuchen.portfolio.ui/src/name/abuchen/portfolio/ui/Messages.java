@@ -559,6 +559,7 @@ public class Messages extends NLS
     public static String LabelAllInboundTransactions;
     public static String LabelAllOutboundTransactions;
     public static String LabelAllSecurities;
+    public static String LabelAllTimeHigh;
     public static String LabelAllTrades;
     public static String LabelAllTransactions;
     public static String LabelAspect;
@@ -659,6 +660,7 @@ public class Messages extends NLS
     public static String LabelCurrencyConverter;
     public static String LabelCurrentConfiguration;
     public static String LabelCurrentDate;
+    public static String LabelCurrentDrawdown;
     public static String LabelCurrentMonth;
     public static String LabelCurrentQuarter;
     public static String LabelCurrentWeek;
@@ -784,6 +786,7 @@ public class Messages extends NLS
     public static String LabelNormalSize;
     public static String LabelNotAvailable;
     public static String LabelNumberDataSeries;
+    public static String LabelNumberOfCandidates;
     public static String LabelOneOfX;
     public static String LabelOnlyLinkToPortfolioReport;
     public static String LabelOpenTrade;
@@ -1087,6 +1090,7 @@ public class Messages extends NLS
     public static String MsgHintNoAttributesConfigured;
     public static String MsgHintNoEvents;
     public static String MsgHintUseOutboundDeliveryForZeroTotal;
+    public static String MsgHistoricalPricesRequireSignIn;
     public static String MsgIncorrectConvertedSubTotal;
     public static String MsgIncorrectSubTotal;
     public static String MsgIncorrectTotal;
@@ -1116,6 +1120,7 @@ public class Messages extends NLS
     public static String MsgRateLimitExceededAndRetrying;
     public static String MsgRestartRequired;
     public static String MsgSecurityHasNoQuotes;
+    public static String MsgSignedInAs;
     public static String MsgThemeRestartRequired;
     public static String MsgUpdatedXEntries;
     public static String MsgUpdateNewInVersionX;
@@ -1253,6 +1258,7 @@ public class Messages extends NLS
     public static String RebalanceInexactTooltip;
     public static String RebalancingChartActualVsTarget;
     public static String SearchSecurityWizardPageSymbolAlreadyExistsInfo;
+    public static String SecuritiesChart_MaxSecuritiesReachedForBenchmarkHint;
     public static String SecuritiesChart_NoDataMessage_NoHoldings;
     public static String SecuritiesChart_NoDataMessage_NoPrices;
     public static String SecuritiesChart_NoDataMessage_NoPricesInSelectedPeriod;
@@ -1366,7 +1372,9 @@ public class Messages extends NLS
     public static String TabTransactions;
     public static String TitlePasswordDialog;
     public static String TooltipAllTimeHigh;
+    public static String TooltipAllTimeHighWidget;
     public static String TooltipAverageHoldingPeriod;
+    public static String TooltipCurrentDrawdown;
     public static String TooltipDateOfExchangeRate;
     public static String TooltipHintPressAlt;
     public static String TooltipMaxDrawdown;
