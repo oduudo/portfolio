@@ -25,12 +25,12 @@
 		<unit id="slf4j.api" version="2.0.16"/>
 		<unit id="slf4j.api.source" version="2.0.16"/>
 	</location>
-	<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 		<repository location="https://download.eclipse.org/nebula/archive/releases/3.1.1/"/>
 		<unit id="org.eclipse.nebula.widgets.cdatetime.feature.feature.group" version="1.5.0.202402011804"/>
 		<unit id="org.eclipse.nebula.widgets.chips.feature.feature.group" version="1.0.0.202402011804"/>
 	</location>
-	<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 		<repository location="https://download.eclipse.org/technology/babel/update-site/R0.20.0/2022-12/"/>
 		<unit id="org.eclipse.babel.nls_eclipse_de.feature.group" version="4.26.0.v20230220105658"/>
 		<unit id="org.eclipse.babel.nls_eclipse_es.feature.group" version="4.26.0.v20230220105658"/>
@@ -91,19 +91,19 @@
 			<dependency>
 				<groupId>org.apache.pdfbox</groupId>
 				<artifactId>fontbox</artifactId>
-				<version>3.0.3</version>
+				<version>3.0.5</version>
 				<type>jar</type>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.pdfbox</groupId>
 				<artifactId>pdfbox-io</artifactId>
-				<version>3.0.3</version>
+				<version>3.0.5</version>
 				<type>jar</type>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.pdfbox</groupId>
 				<artifactId>pdfbox</artifactId>
-				<version>3.0.3</version>
+				<version>3.0.5</version>
 				<type>jar</type>
 			</dependency>
 		</dependencies>
