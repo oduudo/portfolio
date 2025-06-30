@@ -822,6 +822,7 @@ public class Messages extends NLS
     public static String LabelPortfolioTimeMachine;
     public static String LabelPreTax;
     public static String LabelPreviousTradingDay;
+    public static String LabelPriceUpdateProgress;
     public static String LabelPurchasePrice;
     public static String LabelPurchaseTransactionsOnly;
     public static String LabelQuandlCode;
@@ -1065,6 +1066,7 @@ public class Messages extends NLS
     public static String MsgAccountFromMissing;
     public static String MsgAccountMustBeDifferent;
     public static String MsgAccountToMissing;
+    public static String MsgAuthenticationExpired;
     public static String MsgCheckMissingTickerSymbol;
     public static String MsgConfirmInstall;
     public static String MsgCreateTransactionsAutomaticallyUponOpening;
@@ -1119,6 +1121,7 @@ public class Messages extends NLS
     public static String MsgPortfolioMustBeDifferent;
     public static String MsgPortfolioToMissing;
     public static String MsgPreviousStockSplit;
+    public static String MsgRateLimitExceeded;
     public static String MsgRateLimitExceededAndRetrying;
     public static String MsgRestartRequiredAfterGUIReset;
     public static String MsgRestartRequiredAfterUpdate;
@@ -1240,6 +1243,7 @@ public class Messages extends NLS
     public static String PrefTitleDemoAPIKey;
     public static String PrefTitleDivvyDiary;
     public static String PrefTitleEODHistoricalData;
+    public static String PrefTitleExperimentalFeatures;
     public static String PrefTitleFinnhub;
     public static String PrefTitleFormatting;
     public static String PrefTitleGeneral;

@@ -55,7 +55,14 @@ public class YahooFinanceQuoteFeed implements QuoteFeed
         return Messages.LabelYahooFinance;
     }
 
+    @Override
+    public String getGroupingCriterion(Security security)
+    {
+        return "finance.yahoo.com"; //$NON-NLS-1$
+    }
+
     @SuppressWarnings("nls")
+    @VisibleForTesting
     public String rpcLatestQuote(Security security) throws IOException
     {
         return new WebAccess("query1.finance.yahoo.com", "/v8/finance/chart/" + security.getTickerSymbol())
@@ -76,8 +83,11 @@ public class YahooFinanceQuoteFeed implements QuoteFeed
             Optional<String> time = extract(json, 0, "\"regularMarketTime\":", ","); //$NON-NLS-1$ //$NON-NLS-2$
             if (time.isPresent())
             {
+                Optional<String> exchangeTimezoneName = extract(json, 0, "\"exchangeTimezoneName\":\"", "\","); //$NON-NLS-1$ //$NON-NLS-2$
+                var exchangeZoneId = extractTimezone(exchangeTimezoneName.orElse(null), ZoneOffset.UTC);
+
                 long epoch = Long.parseLong(time.get());
-                price.setDate(Instant.ofEpochSecond(epoch).atZone(ZoneId.systemDefault()).toLocalDate());
+                price.setDate(Instant.ofEpochSecond(epoch).atZone(exchangeZoneId).toLocalDate());
             }
 
             Optional<String> value = extract(json, 0, "\"regularMarketPrice\":", ","); //$NON-NLS-1$ //$NON-NLS-2$
@@ -107,6 +117,21 @@ public class YahooFinanceQuoteFeed implements QuoteFeed
         {
             PortfolioLog.abbreviated(e);
             return Optional.empty();
+        }
+    }
+
+    private ZoneId extractTimezone(String exchangeTimezoneName, ZoneOffset defaultZone)
+    {
+        if (exchangeTimezoneName == null || exchangeTimezoneName.isEmpty())
+            return defaultZone;
+
+        try
+        {
+            return ZoneId.of(exchangeTimezoneName);
+        }
+        catch (DateTimeException e)
+        {
+            return defaultZone;
         }
     }
 
@@ -237,20 +262,7 @@ public class YahooFinanceQuoteFeed implements QuoteFeed
             if (result0.containsKey("meta")) //$NON-NLS-1$
             {
                 JSONObject meta = (JSONObject) result0.get("meta"); //$NON-NLS-1$
-
-                String exchangeTimezoneName = (String) meta.get("exchangeTimezoneName"); //$NON-NLS-1$
-                if (exchangeTimezoneName != null)
-                {
-                    try // NOSONAR
-                    {
-                        exchangeZoneId = ZoneId.of(exchangeTimezoneName);
-                    }
-                    catch (DateTimeException e)
-                    {
-                        // Ignore
-                    }
-                }
-
+                exchangeZoneId = extractTimezone((String) meta.get("exchangeTimezoneName"), ZoneOffset.UTC); //$NON-NLS-1$
                 quoteCurrency = (String) meta.get("currency"); //$NON-NLS-1$
             }
 
@@ -264,6 +276,7 @@ public class YahooFinanceQuoteFeed implements QuoteFeed
 
             int size = quotes.size();
 
+            LatestSecurityPrice previous = null;
             for (int index = 0; index < size; index++)
             {
                 Long ts = (Long) timestamp.get(index);
@@ -283,7 +296,12 @@ public class YahooFinanceQuoteFeed implements QuoteFeed
                     price.setLow(LatestSecurityPrice.NOT_AVAILABLE);
                     price.setVolume(LatestSecurityPrice.NOT_AVAILABLE);
 
-                    answer.add(price);
+                    if (previous != null && previous.getDate().equals(price.getDate()))
+                        answer.set(answer.size() - 1, price);
+                    else
+                        answer.add(price);
+
+                    previous = price;
                 }
             }
         }
