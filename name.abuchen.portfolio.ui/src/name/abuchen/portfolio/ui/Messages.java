@@ -549,6 +549,7 @@ public class Messages extends NLS
     public static String LabelAccumulatedInterestCharge;
     public static String LabelAccumulatedTaxes;
     public static String LabelAccumulatedTransferals;
+    public static String LabelAdditionsAndModifications;
     public static String LabelAdhocFilter;
     public static String LabelAfterTaxAndFees;
     public static String LabelAggregation;
@@ -645,11 +646,13 @@ public class Messages extends NLS
     public static String LabelColumns;
     public static String LabelColumnsInReverseOrder;
     public static String LabelCommon;
+    public static String LabelCompleted;
     public static String LabelConfigureSharpeRatioRisklessIRR;
     public static String LabelConsumerPriceIndex;
     public static String LabelConvertBuySellIntoDeliveryTransactions;
     public static String LabelCopyToClipboard;
     public static String LabelCountry;
+    public static String LabelCreateAccountFirst;
     public static String LabelCrosshair;
     public static String LabelCurrencies;
     public static String LabelCurrencyConverter;
@@ -727,6 +730,7 @@ public class Messages extends NLS
     public static String LabelIncludeSecuritiesInPieChart;
     public static String LabelIncludeUnassignedCategoryInCharts;
     public static String LabelInfo;
+    public static String LabelInProgress;
     public static String LabelInputValidationFailed;
     public static String LabelInstallationDetails;
     public static String LabelInterest;
@@ -740,6 +744,7 @@ public class Messages extends NLS
     public static String LabelJSONDateTimezoneHint;
     public static String LabelJSONFactor;
     public static String LabelJSONFactorHint;
+    public static String LabelJSONFile;
     public static String LabelJSONPathHint;
     public static String LabelJSONPathToClose;
     public static String LabelJSONPathToDate;
@@ -1002,10 +1007,12 @@ public class Messages extends NLS
     public static String MenuExportChartData;
     public static String MenuExportData;
     public static String MenuExportDiagram;
+    public static String MenuExportTaxonomy;
     public static String MenuFilterTrades;
     public static String MenuHideColumn;
     public static String MenuHideInformationPane;
     public static String MenuHideSidebar;
+    public static String MenuImportTaxonomy;
     public static String MenuLabelSetAsStartPage;
     public static String MenuMoveDown;
     public static String MenuMoveUp;
@@ -1092,6 +1099,7 @@ public class Messages extends NLS
     public static String MsgHintNoEvents;
     public static String MsgHintUseOutboundDeliveryForZeroTotal;
     public static String MsgHistoricalPricesRequireSignIn;
+    public static String MsgImportCompletedSuccessfully;
     public static String MsgIncorrectConvertedSubTotal;
     public static String MsgIncorrectSubTotal;
     public static String MsgIncorrectTotal;
@@ -1106,6 +1114,7 @@ public class Messages extends NLS
     public static String MsgMissingPortfolio;
     public static String MsgMissingReferenceAccount;
     public static String MsgMissingSecurity;
+    public static String MsgNoChangesToBeApplied;
     public static String MsgNoFileOpen;
     public static String MsgNoFileOpenText;
     public static String MsgNoIssuesFound;
