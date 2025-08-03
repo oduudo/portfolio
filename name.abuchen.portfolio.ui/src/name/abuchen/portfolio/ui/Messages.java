@@ -87,7 +87,9 @@ public class Messages extends NLS
     public static String ClientEditorPerformanceCalculation;
     public static String CmdLogin;
     public static String CmdLogout;
+    public static String CmdMigratePortfolioReport;
     public static String CmdNotNow;
+    public static String CmdUpdateSubscriptionStatus;
     public static String ColumnAbsolutePerformance;
     public static String ColumnAbsolutePerformance_Description;
     public static String ColumnAbsolutePerformance_MenuLabel;
@@ -477,6 +479,7 @@ public class Messages extends NLS
     public static String HeatmapOrnamentSum;
     public static String HelpGroupedAccountsListView;
     public static String HelpURL;
+    public static String HintSubscription;
     public static String HoldingsWarningAssetsWithNegativeValuation;
     public static String HoldingsWarningAssetsWithNegativeValuationDetails;
     public static String ImportWizardPasteSourceDescription;
@@ -792,6 +795,7 @@ public class Messages extends NLS
     public static String LabelOneOfX;
     public static String LabelOnlyLinkToPortfolioReport;
     public static String LabelOpenTrade;
+    public static String LabelOptionPreserveNamesAndDescriptions;
     public static String LabelOrderByTaxonomy;
     public static String LabelPassword;
     public static String LabelPasswordRepeat;
@@ -814,6 +818,7 @@ public class Messages extends NLS
     public static String LabelPerformanceTTWROR;
     public static String LabelPickFile;
     public static String LabelPickFileFormat;
+    public static String LabelPlan;
     public static String LabelPNTransfers;
     public static String LabelPortfolioFeeRate;
     public static String LabelPortfolioPerformance;
@@ -890,6 +895,7 @@ public class Messages extends NLS
     public static String LabelStatementOfAssetsDerivedDataSeries;
     public static String LabelStatementOfAssetsHistory;
     public static String LabelStatementOfAssetsHoldings;
+    public static String LabelSubscriptionStatusUpdatedSuccessfully;
     public static String LabelSuffix_HICP;
     public static String LabelSuffix_PreTax;
     public static String LabelTaxesAndFeesIncluded;
