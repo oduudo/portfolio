@@ -85,10 +85,13 @@ public class Messages extends NLS
     public static String ClientEditorLabelReports;
     public static String ClientEditorLabelReturnsVolatility;
     public static String ClientEditorPerformanceCalculation;
+    public static String CmdCreateNewTaxonomy;
+    public static String CmdDoNotImport;
     public static String CmdLogin;
     public static String CmdLogout;
     public static String CmdMigratePortfolioReport;
     public static String CmdNotNow;
+    public static String CmdUpdate;
     public static String CmdUpdateSubscriptionStatus;
     public static String ColumnAbsolutePerformance;
     public static String ColumnAbsolutePerformance_Description;
@@ -102,6 +105,7 @@ public class Messages extends NLS
     public static String ColumnAccount2nd;
     public static String ColumnAccountFrom;
     public static String ColumnAccountTo;
+    public static String ColumnAction;
     public static String ColumnActualPercent;
     public static String ColumnActualValue;
     public static String ColumnActualValueBaseCurrency;
@@ -552,6 +556,7 @@ public class Messages extends NLS
     public static String LabelAccumulatedInterestCharge;
     public static String LabelAccumulatedTaxes;
     public static String LabelAccumulatedTransferals;
+    public static String LabelActiveSecurities;
     public static String LabelAdditionsAndModifications;
     public static String LabelAdhocFilter;
     public static String LabelAfterTaxAndFees;
@@ -726,6 +731,7 @@ public class Messages extends NLS
     public static String LabelHeatmapInvestmentsNoSellings;
     public static String LabelHeatmapOrnament;
     public static String LabelHeatmapTaxes;
+    public static String LabelHeldSecurities;
     public static String LabelHide;
     public static String LabelHideMarkings;
     public static String LabelHistoricalReturnsAndVolatiltity;
@@ -796,6 +802,7 @@ public class Messages extends NLS
     public static String LabelOnlyLinkToPortfolioReport;
     public static String LabelOpenTrade;
     public static String LabelOptionPreserveNamesAndDescriptions;
+    public static String LabelOptionPruneAbsentClassifications;
     public static String LabelOrderByTaxonomy;
     public static String LabelPassword;
     public static String LabelPasswordRepeat;
@@ -830,6 +837,8 @@ public class Messages extends NLS
     public static String LabelPreTax;
     public static String LabelPreviousTradingDay;
     public static String LabelPriceUpdateProgress;
+    public static String LabelPriceUpdateStrategy;
+    public static String LabelPriceUpdateStrategyInfo;
     public static String LabelPurchasePrice;
     public static String LabelPurchaseTransactionsOnly;
     public static String LabelQuandlCode;
@@ -842,6 +851,7 @@ public class Messages extends NLS
     public static String LabelRatio;
     public static String LabelRefresh;
     public static String LabelRemoveDividends;
+    public static String LabelMonthlyPNTransfers;
     public static String LabelRemoveLogo;
     public static String LabelReportingAddPeriod;
     public static String LabelReportingDialogDay;
@@ -931,7 +941,7 @@ public class Messages extends NLS
     public static String LabelUnexpectedQuotes;
     public static String LabelUnexpectedQuotes_Description;
     public static String LabelUnhide;
-    public static String LabelUnknownVersion;
+    public static String LabelUnknown;
     public static String LabelUnnamedFile;
     public static String LabelUnnamedXml;
     public static String LabelUpdatedConfiguration;
@@ -998,6 +1008,7 @@ public class Messages extends NLS
     public static String MenuCreateAndManageClientFilter;
     public static String MenuCreateColumnConfig;
     public static String MenuCreatePortfolioOrTransaction;
+    public static String MenuCreateRemovalForDividendAction;
     public static String MenuDashboardColumnWidth;
     public static String MenuDashboardColumnWidthDecrease;
     public static String MenuDashboardColumnWidthIncrease;
@@ -1013,12 +1024,10 @@ public class Messages extends NLS
     public static String MenuExportChartData;
     public static String MenuExportData;
     public static String MenuExportDiagram;
-    public static String MenuExportTaxonomy;
     public static String MenuFilterTrades;
     public static String MenuHideColumn;
     public static String MenuHideInformationPane;
     public static String MenuHideSidebar;
-    public static String MenuImportTaxonomy;
     public static String MenuLabelSetAsStartPage;
     public static String MenuMoveDown;
     public static String MenuMoveUp;
@@ -1198,6 +1207,7 @@ public class Messages extends NLS
     public static String PortfolioMenuDeleteConfirm;
     public static String PortfolioReportMissingAPIKey;
     public static String PortfolioReportMissingAPIURL;
+    public static String PortfolioReportNotificationMessage;
     public static String PrefAlphaVantageAPIKey;
     public static String PrefAlphaVantageCallFrequencyLimit;
     public static String PrefAutoSaveFrequency;
@@ -1269,6 +1279,7 @@ public class Messages extends NLS
     public static String PrefTitleTwelveData;
     public static String PrefTwelveDataAPIKey;
     public static String PrefUpdateQuotesAfterFileOpen;
+    public static String PrefUpdateQuotesPeriodically;
     public static String PrefUpdateSite;
     public static String PresetsPrefPageDescription;
     public static String PresetsPrefPageNow;
@@ -1386,6 +1397,11 @@ public class Messages extends NLS
     public static String SplitWizardReviewQuotesTitle;
     public static String SplitWizardReviewTransactionsDescription;
     public static String SplitWizardReviewTransactionsTitle;
+    public static String StatusLoading;
+    public static String StatusNoChange;
+    public static String StatusSkipped;
+    public static String StatusUpdated;
+    public static String StatusWaiting;
     public static String SystemMenuChangelog;
     public static String SystemMenuCheckForUpdates;
     public static String SystemMenuNewAndNoteworthy;

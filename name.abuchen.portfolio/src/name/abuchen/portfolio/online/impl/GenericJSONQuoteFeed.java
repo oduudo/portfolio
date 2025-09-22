@@ -249,6 +249,9 @@ public class GenericJSONQuoteFeed implements QuoteFeed
             List<Object> dates = ctx.read(dateP);
             List<Object> close = ctx.read(closeP);
 
+            // Create DateTimeFormatter once if custom format is provided
+            Optional<DateTimeFormatter> customFormatter = dateFormat.map(DateTimeFormatter::ofPattern);
+
             Optional<List<Object>> high = Optional.empty();
             Optional<List<Object>> low = Optional.empty();
             Optional<List<Object>> volume = Optional.empty();
@@ -289,51 +292,66 @@ public class GenericJSONQuoteFeed implements QuoteFeed
 
             int size = dates.size();
 
+            // avoid flooding of error messages (as we do not stop processing on
+            // first ParseException) anymore
+            var didLogError = false;
+
             for (int index = 0; index < size; index++)
             {
-                LatestSecurityPrice price = new LatestSecurityPrice();
-
-                // date
-                Object object = dates.get(index);
-                price.setDate(this.extractDate(object, dateFormat, dateTimezone));
-
-                // close
-                object = close.get(index);
-                price.setValue(this.extractValue(object, factor));
-
-                if (price.getDate() != null && price.getValue() > 0)
+                try
                 {
-                    if (high.isPresent())
+                    LatestSecurityPrice price = new LatestSecurityPrice();
+
+                    // date
+                    Object object = dates.get(index);
+                    price.setDate(this.extractDate(object, customFormatter, dateTimezone));
+
+                    // close
+                    object = close.get(index);
+                    price.setValue(this.extractValue(object, factor));
+
+                    if (price.getDate() != null && price.getValue() > 0)
                     {
-                        price.setHigh(this.extractValue(high.get().get(index), factor));
+                        if (high.isPresent())
+                        {
+                            price.setHigh(this.extractValue(high.get().get(index), factor));
+                        }
+                        else
+                        {
+                            price.setHigh(LatestSecurityPrice.NOT_AVAILABLE);
+                        }
+                        if (low.isPresent())
+                        {
+                            price.setLow(this.extractValue(low.get().get(index), factor));
+                        }
+                        else
+                        {
+                            price.setLow(LatestSecurityPrice.NOT_AVAILABLE);
+                        }
+                        if (volume.isPresent())
+                        {
+                            price.setVolume(this.extractIntegerValue(volume.get().get(index)));
+                        }
+                        else
+                        {
+                            price.setVolume(LatestSecurityPrice.NOT_AVAILABLE);
+                        }
+                        prices.add(price);
                     }
-                    else
+                }
+                catch (ParseException e)
+                {
+                    if (!didLogError)
                     {
-                        price.setHigh(LatestSecurityPrice.NOT_AVAILABLE);
+                        data.addError(new IOException(url + '\n' + e.getMessage(), e));
+                        didLogError = true;
                     }
-                    if (low.isPresent())
-                    {
-                        price.setLow(this.extractValue(low.get().get(index), factor));
-                    }
-                    else
-                    {
-                        price.setLow(LatestSecurityPrice.NOT_AVAILABLE);
-                    }
-                    if (volume.isPresent())
-                    {
-                        price.setVolume(this.extractIntegerValue(volume.get().get(index)));
-                    }
-                    else
-                    {
-                        price.setVolume(LatestSecurityPrice.NOT_AVAILABLE);
-                    }
-                    prices.add(price);
                 }
             }
 
             return prices;
         }
-        catch (JsonPathException | ParseException e)
+        catch (JsonPathException e)
         {
             data.addError(new IOException(url + '\n' + e.getMessage(), e));
             return Collections.emptyList();
@@ -368,15 +386,16 @@ public class GenericJSONQuoteFeed implements QuoteFeed
     }
 
     @VisibleForTesting
-    /* testing */ LocalDate extractDate(Object object, Optional<String> dateFormat, Optional<String> dateTimezone)
+    /* testing */ LocalDate extractDate(Object object, Optional<DateTimeFormatter> customFormatter,
+                    Optional<String> dateTimezone)
     {
         final ZoneOffset offset = dateTimezone.isPresent()
                         ? ZoneId.of(dateTimezone.get()).getRules().getOffset(Instant.now())
                         : ZoneOffset.UTC;
 
-        if (dateFormat.isPresent())
+        if (customFormatter.isPresent())
         {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat.get());
+            var formatter = customFormatter.get();
             return parseDate(object.toString(), formatter, offset);
         }
 

@@ -2987,11 +2987,15 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                                         // 01 Dez.
                                         // Zinszahlung Your interest payment 15,77 € 7.395,00 €
                                         // 2024
+                                        //
+                                        // 01 ago
+                                        // Pago de intereses Interest payment 47,64 € 34.107,54 €
+                                        // 2025
                                         // @formatter:on
                                         section -> section //
                                                         .attributes("date", "amount", "currency", "year") //
                                                         .match("^(?<date>[\\d]{2} [\\p{L}]{3,4}([\\.]{1})?).*$")
-                                                        .match("^(Zinszahlung|intereses|d.int.r.ts) Your interest payment (?<amount>[\\.,\\d]+) (?<currency>\\p{Sc}) [\\.,\\d]+ \\p{Sc}$") //
+                                                        .match("^(Zinszahlung|intereses|d.int.r.ts|Pago de intereses) (Your interest payment|Interest payment) (?<amount>[\\.,\\d]+) (?<currency>\\p{Sc}) [\\.,\\d]+ \\p{Sc}$") //
                                                         .match("^(?<year>[\\d]{4})$") //
                                                         .assign((t, v) -> {
                                                             t.setDateTime(asDate(v.get("date") + " " + v.get("year")));
@@ -3371,12 +3375,21 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
                         .oneOf( //
                                         // @formatter:off
+                                        // BETRAG GEBÜHR STATUS ÜBERWEISUNGSDATUM TYP REFERENZ
+                                        // 1.000,00 € 0,00 € Ausgeführt 21.08.2025 SEPA Überweisung
+                                        // @formatter:on
+                                        section -> section //
+                                                        .attributes("date") //
+                                                        .find("BETRAG GEB.HR STATUS .BERWEISUNGSDATUM TYP REFERENZ") //
+                                                        .match("^[\\.,\\d]+ \\p{Sc} .* (?<date>[\\d]{2}\\.[\\d]{2}\\.[\\d]{4}).*$") //
+                                                        .assign((t, v) -> t.setDateTime(asDate(v.get("date")))),
+                                        // @formatter:off
                                         // BETRAG STATUS ÜBERWEISUNGSDATUM TYP REFERENZ
                                         // 6.400,00 € Ausgeführt 01.04.2025 SEPA Überweisung
                                         // @formatter:on
                                         section -> section //
                                                         .attributes("date") //
-                                                        .find("BETRAG STATUS ÜBERWEISUNGSDATUM TYP REFERENZ") //
+                                                        .find("BETRAG STATUS .BERWEISUNGSDATUM TYP REFERENZ") //
                                                         .match("^[\\.,\\d]+ \\p{Sc} .* (?<date>[\\d]{2}\\.[\\d]{2}\\.[\\d]{4}).*$") //
                                                         .assign((t, v) -> t.setDateTime(asDate(v.get("date")))),
                                         // @formatter:off
@@ -3387,6 +3400,15 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                                                         .attributes("date") //
                                                         .find("VERRECHNUNGSKONTO WERTSTELLUNG BETRAG") //
                                                         .match("^.* (?<date>[\\d]{2}\\.[\\d]{2}\\.[\\d]{4}) [\\.,\\d]+ [A-Z]{3}$") //
+                                                        .assign((t, v) -> t.setDateTime(asDate(v.get("date")))),
+                                        // @formatter:off
+                                        // VERRECHNUNGSKONTO WERTSTELLUNG GESAMTBETRAG
+                                        // DE27100999999999999301 01.09.2025 25,00 €
+                                        // @formatter:on
+                                        section -> section //
+                                                        .attributes("date") //
+                                                        .find("VERRECHNUNGSKONTO WERTSTELLUNG GESAMTBETRAG") //
+                                                        .match("^.* (?<date>[\\d]{2}\\.[\\d]{2}\\.[\\d]{4}) [\\.,\\d]+ \\p{Sc}$") //
                                                         .assign((t, v) -> t.setDateTime(asDate(v.get("date")))),
                                         // @formatter:off
                                         // COMPTE-ESPÈCES DATE DE VALEUR MONTANT
@@ -3400,12 +3422,27 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
 
                         .oneOf( //
                                         // @formatter:off
+                                        // BETRAG GEBÜHR STATUS ÜBERWEISUNGSDATUM TYP REFERENZ
+                                        // 1.000,00 € 0,00 € Ausgeführt 21.08.2025 SEPA Überweisung
+                                        // @formatter:on
+                                        section -> section //
+                                                        .attributes("amount", "currency", "note") //
+                                                        .find("BETRAG GEB.HR STATUS .BERWEISUNGSDATUM TYP REFERENZ") //
+                                                        .match("^(?<amount>[\\.,\\d]+) (?<currency>\\p{Sc}) .* [\\d]{2}\\.[\\d]{2}\\.[\\d]{4} (?<note>.*)$") //
+                                                        .assign((t, v) -> {
+                                                            t.setType(AccountTransaction.Type.REMOVAL);
+
+                                                            t.setCurrencyCode(asCurrencyCode(v.get("currency")));
+                                                            t.setAmount(asAmount(v.get("amount")));
+                                                            t.setNote(trim(v.get("note")));
+                                                        }),
+                                        // @formatter:off
                                         // VERRECHNUNGSKONTO WERTSTELLUNG BETRAG
                                         // 6.400,00 € Ausgeführt 01.04.2025 SEPA Überweisung
                                         // @formatter:on
                                         section -> section //
                                                         .attributes("amount", "currency", "note") //
-                                                        .find("BETRAG STATUS ÜBERWEISUNGSDATUM TYP REFERENZ") //
+                                                        .find("BETRAG STATUS .BERWEISUNGSDATUM TYP REFERENZ") //
                                                         .match("^(?<amount>[\\.,\\d]+) (?<currency>\\p{Sc}) .* [\\d]{2}\\.[\\d]{2}\\.[\\d]{4} (?<note>.*)$") //
                                                         .assign((t, v) -> {
                                                             t.setCurrencyCode(asCurrencyCode(v.get("currency")));
@@ -3420,6 +3457,18 @@ public class TradeRepublicPDFExtractor extends AbstractPDFExtractor
                                                         .attributes("amount", "currency") //
                                                         .find("VERRECHNUNGSKONTO WERTSTELLUNG BETRAG") //
                                                         .match("^.* [\\d]{2}\\.[\\d]{2}\\.[\\d]{4} (?<amount>[\\.,\\d]+) (?<currency>[A-Z]{3})$") //
+                                                        .assign((t, v) -> {
+                                                            t.setCurrencyCode(asCurrencyCode(v.get("currency")));
+                                                            t.setAmount(asAmount(v.get("amount")));
+                                                        }),
+                                        // @formatter:off
+                                        // VERRECHNUNGSKONTO WERTSTELLUNG GESAMTBETRAG
+                                        // DE27100999999999999301 01.09.2025 25,00 €
+                                        // @formatter:on
+                                        section -> section //
+                                                        .attributes("amount", "currency") //
+                                                        .find("VERRECHNUNGSKONTO WERTSTELLUNG GESAMTBETRAG") //
+                                                        .match("^.* [\\d]{2}\\.[\\d]{2}\\.[\\d]{4} (?<amount>[\\.,\\d]+) (?<currency>\\p{Sc})$") //
                                                         .assign((t, v) -> {
                                                             t.setCurrencyCode(asCurrencyCode(v.get("currency")));
                                                             t.setAmount(asAmount(v.get("amount")));
