@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.text.ParseException;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import org.json.simple.JSONArray;
@@ -24,44 +22,26 @@ import name.abuchen.portfolio.online.QuoteFeed;
 import name.abuchen.portfolio.online.QuoteFeedData;
 import name.abuchen.portfolio.util.WebAccess;
 
-/**
- * MEXC Crypto Exchange
- * https://www.mexc.com/api-docs/spot-v3/market-data-endpoints
- */
-public final class MEXCQuoteFeed implements QuoteFeed
+/* package */ abstract class AbstractBinanceQuoteFeed implements QuoteFeed
 {
-    private static class ResponseData
-    {
-        LocalDate start;
-        String json;
-    }
-
-    public static final String ID = "MEXC"; //$NON-NLS-1$
-
     private static final long SECONDS_PER_DAY = 24L * 60 * 60;
-    private final PageCache<ResponseData> cache = new PageCache<>(Duration.ofMinutes(1));
 
-    @Override
-    public String getId()
-    {
-        return ID;
-    }
+    private final long limit;
 
-    @Override
-    public String getName()
+    AbstractBinanceQuoteFeed(long limit)
     {
-        return "MEXC Crypto Exchange"; //$NON-NLS-1$
+        this.limit = limit;
     }
 
     @Override
     public Optional<LatestSecurityPrice> getLatestQuote(Security security)
     {
-        QuoteFeedData data = getHistoricalQuotes(security, false, LocalDate.now());
+        var data = getHistoricalQuotes(security, false, LocalDate.now());
 
         if (!data.getErrors().isEmpty())
             PortfolioLog.abbreviated(data.getErrors());
 
-        List<LatestSecurityPrice> prices = data.getLatestPrices();
+        var prices = data.getLatestPrices();
 
         if (prices.isEmpty())
             return Optional.empty();
@@ -79,8 +59,7 @@ public final class MEXCQuoteFeed implements QuoteFeed
         if (!security.getPrices().isEmpty())
             quoteStartDate = security.getPrices().get(security.getPrices().size() - 1).getDate();
         else
-            // API has a limit of 1000. Therefore read only the most recent days
-            quoteStartDate = LocalDate.now().minusDays(999);
+            quoteStartDate = LocalDate.now().minusDays(limit - 1);
 
         return getHistoricalQuotes(security, collectRawResponse, quoteStartDate);
     }
@@ -92,12 +71,12 @@ public final class MEXCQuoteFeed implements QuoteFeed
     }
 
     @SuppressWarnings("unchecked")
-    private void convertMEXCJsonArray(JSONArray ohlcArray, QuoteFeedData data)
+    private void convertBinanceJsonArray(JSONArray ohlcArray, QuoteFeedData data)
     {
         if (ohlcArray.isEmpty())
             return;
 
-        List<LatestSecurityPrice> prices = new ArrayList<>();
+        var prices = new ArrayList<LatestSecurityPrice>();
 
         if (ohlcArray.get(0) instanceof JSONArray)
         {
@@ -155,37 +134,21 @@ public final class MEXCQuoteFeed implements QuoteFeed
             return QuoteFeedData.withError(
                             new IOException(MessageFormat.format(Messages.MsgMissingTickerSymbol, security.getName())));
 
-        QuoteFeedData data = new QuoteFeedData();
+        var data = new QuoteFeedData();
 
-        final Long tickerStartEpochMilliSeconds = start.atStartOfDay(ZoneOffset.UTC).toEpochSecond() * 1000;
+        long tickerStartEpochMilliSeconds = start.atStartOfDay(ZoneOffset.UTC).toEpochSecond() * 1000;
 
         try
         {
-            WebAccess webaccess = new WebAccess("api.mexc.com", "/api/v3/klines") //$NON-NLS-1$ //$NON-NLS-2$
-                            // Ticker: BTCEUR, BTCUSDT, ...
-                            .addParameter("symbol", security.getTickerSymbol()) //$NON-NLS-1$
-                            .addParameter("interval", "1d") //$NON-NLS-1$ //$NON-NLS-2$
-                            .addParameter("startTime", tickerStartEpochMilliSeconds.toString()) //$NON-NLS-1$
-                            .addParameter("limit", "1000"); //$NON-NLS-1$ //$NON-NLS-2$
-
-            var response = cache.lookup(security.getTickerSymbol());
-
-            if (response == null || response.start.isAfter(start))
-            {
-                response = new ResponseData();
-                response.start = start;
-                response.json = webaccess.get();
-
-                if (response.json != null)
-                    cache.put(security.getTickerSymbol(), response);
-            }
+            var webaccess = constructQuery(security, tickerStartEpochMilliSeconds);
+            var json = webaccess.get();
 
             if (collectRawResponse)
-                data.addResponse(webaccess.getURL(), response.json);
+                data.addResponse(webaccess.getURL(), json);
 
-            var ohlcItems = (JSONArray) JSONValue.parse(response.json);
+            var ohlcItems = (JSONArray) JSONValue.parse(json);
 
-            convertMEXCJsonArray(ohlcItems, data);
+            convertBinanceJsonArray(ohlcItems, data);
         }
         catch (IOException | URISyntaxException e)
         {
@@ -194,4 +157,7 @@ public final class MEXCQuoteFeed implements QuoteFeed
 
         return data;
     }
+
+    protected abstract WebAccess constructQuery(Security security, final Long tickerStartEpochMilliSeconds);
+
 }
