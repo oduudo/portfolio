@@ -20,6 +20,7 @@ import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.hasTaxes;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.hasTicker;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.hasWkn;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.interest;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.interestCharge;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.outboundDelivery;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.purchase;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.removal;
@@ -1196,6 +1197,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -1228,6 +1231,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -1260,6 +1265,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -1292,6 +1299,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -1324,6 +1333,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -1364,6 +1375,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -1390,6 +1403,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -1422,6 +1437,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -1462,6 +1479,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -1488,6 +1507,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -1520,6 +1541,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -1560,6 +1583,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -1586,6 +1611,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -1626,6 +1653,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -1652,6 +1681,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -1684,6 +1715,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -1716,6 +1749,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -1748,6 +1783,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -1780,6 +1817,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -1820,6 +1859,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -2652,6 +2693,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -2684,6 +2727,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -2716,6 +2761,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -2748,6 +2795,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -2788,6 +2837,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -2814,6 +2865,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -2846,6 +2899,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -2878,6 +2933,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -2908,6 +2965,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(1L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -2987,6 +3046,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -2998,7 +3059,7 @@ public class BaaderBankPDFExtractorTest
 
         // check taxes transaction
         assertThat(results, hasItem(withFailureMessage( //
-                        Messages.MsgErrorTransactionTypeNotSupported, //
+                        Messages.MsgErrorTransactionTypeNotSupportedOrRequired, //
                         taxes( //
                                         hasDate("2024-01-02T00:00"), hasShares(220.00), //
                                         hasSource("Vorabpauschale02.txt"), //
@@ -3021,6 +3082,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -3032,7 +3095,7 @@ public class BaaderBankPDFExtractorTest
 
         // check taxes transaction
         assertThat(results, hasItem(withFailureMessage( //
-                        Messages.MsgErrorTransactionTypeNotSupported, //
+                        Messages.MsgErrorTransactionTypeNotSupportedOrRequired, //
                         taxes( //
                                         hasDate("2025-01-02T00:00"), hasShares(48.00), //
                                         hasSource("Vorabpauschale03.txt"), //
@@ -3055,6 +3118,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -4095,6 +4160,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -4135,6 +4202,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -4161,6 +4230,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -4201,6 +4272,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -4227,6 +4300,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "USD");
 
@@ -4266,6 +4341,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "USD");
 
@@ -4293,6 +4370,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "USD");
 
@@ -4332,6 +4411,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "USD");
 
@@ -4359,6 +4440,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "USD");
 
@@ -4398,6 +4481,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "USD");
 
@@ -4425,6 +4510,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "USD");
 
@@ -4464,6 +4551,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "USD");
 
@@ -4491,6 +4580,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "USD");
 
@@ -4530,6 +4621,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "USD");
 
@@ -4557,6 +4650,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "USD");
 
@@ -4596,6 +4691,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "USD");
 
@@ -4623,6 +4720,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -4663,6 +4762,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -4689,6 +4790,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -4721,6 +4824,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "USD");
 
@@ -4760,6 +4865,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "USD");
 
@@ -4787,6 +4894,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -4827,6 +4936,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -4853,6 +4964,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -4893,6 +5006,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -4919,6 +5034,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -4929,7 +5046,7 @@ public class BaaderBankPDFExtractorTest
                         hasCurrencyCode("EUR"))));
 
         assertThat(results, hasItem(withFailureMessage( //
-                        Messages.MsgErrorOrderCancellationUnsupported, //
+                        Messages.MsgErrorTransactionOrderCancellationUnsupported, //
                         dividend( //
                                         hasDate("2022-06-13"), hasShares(10.672), //
                                         hasSource("DividendeStorno01.txt"), //
@@ -4973,7 +5090,7 @@ public class BaaderBankPDFExtractorTest
                         .findFirst().orElseThrow(IllegalArgumentException::new);
 
         assertThat(((AccountTransaction) cancellation.getSubject()).getType(), is(AccountTransaction.Type.DIVIDENDS));
-        assertThat(cancellation.getFailureMessage(), is(Messages.MsgErrorOrderCancellationUnsupported));
+        assertThat(cancellation.getFailureMessage(), is(Messages.MsgErrorTransactionOrderCancellationUnsupported));
 
         assertThat(((Transaction) cancellation.getSubject()).getDateTime(),
                         is(LocalDateTime.parse("2021-10-18T00:00")));
@@ -5009,6 +5126,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -5020,7 +5139,7 @@ public class BaaderBankPDFExtractorTest
 
         // check cancellation (Storno) transaction
         assertThat(results, hasItem(withFailureMessage( //
-                        Messages.MsgErrorOrderCancellationUnsupported, //
+                        Messages.MsgErrorTransactionOrderCancellationUnsupported, //
                         dividend( //
                                         hasDate("2022-10-14T00:00"), hasShares(5.683), //
                                         hasSource("DividendeStorno03.txt"), //
@@ -5051,12 +5170,14 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
         // check cancellation (Storno) transaction
         assertThat(results, hasItem(withFailureMessage( //
-                        Messages.MsgErrorOrderCancellationUnsupported, //
+                        Messages.MsgErrorTransactionOrderCancellationUnsupported, //
                         dividend( //
                                         hasDate("2022-10-14T00:00"), hasShares(5.683), //
                                         hasSource("DividendeStorno03.txt"), //
@@ -5079,6 +5200,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -5090,7 +5213,7 @@ public class BaaderBankPDFExtractorTest
 
         // check cancellation (Storno) transaction
         assertThat(results, hasItem(withFailureMessage( //
-                        Messages.MsgErrorOrderCancellationUnsupported, //
+                        Messages.MsgErrorTransactionOrderCancellationUnsupported, //
                         dividend( //
                                         hasDate("2023-01-13T00:00"), hasShares(39.00), //
                                         hasSource("DividendeStorno04.txt"), //
@@ -5121,12 +5244,14 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
         // check cancellation (Storno) transaction
         assertThat(results, hasItem(withFailureMessage( //
-                        Messages.MsgErrorOrderCancellationUnsupported, //
+                        Messages.MsgErrorTransactionOrderCancellationUnsupported, //
                         dividend( //
                                         hasDate("2023-01-13T00:00"), hasShares(39.00), //
                                         hasSource("DividendeStorno04.txt"), //
@@ -5149,6 +5274,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -5160,7 +5287,7 @@ public class BaaderBankPDFExtractorTest
 
         // check cancellation (Storno) transaction
         assertThat(results, hasItem(withFailureMessage( //
-                        Messages.MsgErrorOrderCancellationUnsupported, //
+                        Messages.MsgErrorTransactionOrderCancellationUnsupported, //
                         dividend( //
                                         hasDate("2024-06-26T00:00"), hasShares(4.003), //
                                         hasSource("DividendeStorno05.txt"), //
@@ -5292,6 +5419,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -5319,6 +5448,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -5555,6 +5686,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(3L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(3));
         new AssertImportActions().check(results, "EUR");
 
@@ -5585,6 +5718,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(3L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(3));
         new AssertImportActions().check(results, "EUR");
 
@@ -5615,6 +5750,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -5637,6 +5774,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(7L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(7));
         new AssertImportActions().check(results, "EUR");
 
@@ -5711,6 +5850,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(2L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -5737,6 +5878,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -5759,6 +5902,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(5L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(5));
         new AssertImportActions().check(results, "EUR");
 
@@ -5802,6 +5947,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(3L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(3));
         new AssertImportActions().check(results, "EUR");
 
@@ -5832,6 +5979,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(0));
         assertTrue(results.isEmpty());
         new AssertImportActions().check(results, "EUR");
@@ -5994,6 +6143,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -6020,6 +6171,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -6029,6 +6182,34 @@ public class BaaderBankPDFExtractorTest
                         hasSource("Rechnungsabschluss02.txt"), //
                         hasNote("Vorgangs-Nr.: 123456789 | 31.03.2025 bis 30.06.2025"), //
                         hasAmount("EUR", 55.40), hasGrossValue("EUR", 55.40), //
+                        hasTaxes("EUR", 0.00), hasFees("EUR", 0.00))));
+    }
+
+    @Test
+    public void testRechnungsabschluss03()
+    {
+        var extractor = new BaaderBankPDFExtractor(new Client());
+
+        List<Exception> errors = new ArrayList<>();
+
+        var results = extractor.extract(PDFInputFile.loadTestCase(getClass(), "Rechnungsabschluss03.txt"), errors);
+
+        assertThat(errors, empty());
+        assertThat(countSecurities(results), is(0L));
+        assertThat(countBuySell(results), is(0L));
+        assertThat(countAccountTransactions(results), is(1L));
+        assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
+        assertThat(results.size(), is(1));
+        new AssertImportActions().check(results, "EUR");
+
+        // check interest transaction
+        assertThat(results, hasItem(interestCharge( //
+                        hasDate("2025-12-31T00:00"), //
+                        hasSource("Rechnungsabschluss03.txt"), //
+                        hasNote("Vorgangs-Nr.: 123456789 | 30.09.2025 bis 31.12.2025"), //
+                        hasAmount("EUR", 5.64), hasGrossValue("EUR", 5.64), //
                         hasTaxes("EUR", 0.00), hasFees("EUR", 0.00))));
     }
 
@@ -6047,6 +6228,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(1));
         new AssertImportActions().check(results, "EUR");
 
@@ -6142,6 +6325,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -6153,7 +6338,7 @@ public class BaaderBankPDFExtractorTest
 
         // check unsupported transaction
         assertThat(results, hasItem(withFailureMessage( //
-                        Messages.MsgErrorTransactionTypeNotSupported, //
+                        Messages.MsgErrorTransactionTypeNotSupportedOrRequired, //
                         outboundDelivery( //
                                         hasDate("2024-01-18T00:00"), hasShares(277.691), //
                                         hasSource("Fusion01.txt"), //
@@ -6176,6 +6361,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -6187,7 +6374,7 @@ public class BaaderBankPDFExtractorTest
 
         // check unsupported transaction
         assertThat(results, hasItem(withFailureMessage( //
-                        Messages.MsgErrorTransactionTypeNotSupported, //
+                        Messages.MsgErrorTransactionTypeNotSupportedOrRequired, //
                         outboundDelivery( //
                                         hasDate("2023-03-24T00:00"), hasShares(2.00), //
                                         hasSource("Fusion02.txt"), //
@@ -6210,6 +6397,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -6221,7 +6410,7 @@ public class BaaderBankPDFExtractorTest
 
         // check unsupported transaction
         assertThat(results, hasItem(withFailureMessage( //
-                        Messages.MsgErrorTransactionTypeNotSupported, //
+                        Messages.MsgErrorTransactionTypeNotSupportedOrRequired, //
                         outboundDelivery( //
                                         hasDate("2024-11-22T00:00"), hasShares(26.00), //
                                         hasSource("Fusion03.txt"), //
@@ -6244,6 +6433,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -6255,7 +6446,7 @@ public class BaaderBankPDFExtractorTest
 
         // check unsupported transaction
         assertThat(results, hasItem(withFailureMessage( //
-                        Messages.MsgErrorTransactionTypeNotSupported, //
+                        Messages.MsgErrorTransactionTypeNotSupportedOrRequired, //
                         outboundDelivery( //
                                         hasDate("2023-01-25T00:00"), hasShares(1.00), //
                                         hasSource("Depoteinlieferung01.txt"), //
@@ -6278,6 +6469,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -6289,7 +6482,7 @@ public class BaaderBankPDFExtractorTest
 
         // check unsupported transaction
         assertThat(results, hasItem(withFailureMessage( //
-                        Messages.MsgErrorTransactionTypeNotSupported, //
+                        Messages.MsgErrorTransactionTypeNotSupportedOrRequired, //
                         outboundDelivery( //
                                         hasDate("2022-07-15T00:00"), hasShares(1.00), //
                                         hasSource("Depoteinlieferung02.txt"), //
@@ -6312,6 +6505,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -6323,7 +6518,7 @@ public class BaaderBankPDFExtractorTest
 
         // check unsupported transaction
         assertThat(results, hasItem(withFailureMessage( //
-                        Messages.MsgErrorTransactionTypeNotSupported, //
+                        Messages.MsgErrorTransactionTypeNotSupportedOrRequired, //
                         outboundDelivery( //
                                         hasDate("2022-03-30T00:00"), hasShares(3.00), //
                                         hasSource("Depoteinlieferung03.txt"), //
@@ -6346,6 +6541,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -6357,7 +6554,7 @@ public class BaaderBankPDFExtractorTest
 
         // check unsupported transaction
         assertThat(results, hasItem(withFailureMessage( //
-                        Messages.MsgErrorSplitTransactionsNotSupported, //
+                        Messages.MsgErrorTransactionSplitUnsupported, //
                         outboundDelivery( //
                                         hasDate("2024-06-20T00:00"), hasShares(700.00), //
                                         hasSource("Split01.txt"), //
@@ -6380,6 +6577,8 @@ public class BaaderBankPDFExtractorTest
         assertThat(countBuySell(results), is(0L));
         assertThat(countAccountTransactions(results), is(1L));
         assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(1L));
+        assertThat(countSkippedItems(results), is(0L));
         assertThat(results.size(), is(2));
         new AssertImportActions().check(results, "EUR");
 
@@ -6391,7 +6590,7 @@ public class BaaderBankPDFExtractorTest
 
         // check unsupported transaction
         assertThat(results, hasItem(withFailureMessage( //
-                        Messages.MsgErrorSplitTransactionsNotSupported, //
+                        Messages.MsgErrorTransactionSplitUnsupported, //
                         outboundDelivery( //
                                         hasDate("2024-01-02T00:00"), hasShares(63.00), //
                                         hasSource("Split02.txt"), //

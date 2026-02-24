@@ -650,6 +650,7 @@ public class Messages extends NLS
     public static String LabelColonSeparated;
     public static String LabelColorBy;
     public static String LabelColorSchema;
+    public static String LabelColorValueScheme;
     public static String LabelColumns;
     public static String LabelColumnsInReverseOrder;
     public static String LabelCommon;
@@ -686,6 +687,8 @@ public class Messages extends NLS
     public static String LabelDuplicateSecurity;
     public static String LabelEarnings;
     public static String LabelEarningsByTaxonomy;
+    public static String LabelEarningsDividendDateType;
+    public static String LabelEarningsDividendList;
     public static String LabelEarningsPerMonth;
     public static String LabelEarningsPerQuarter;
     public static String LabelEarningsPerYear;
@@ -783,6 +786,8 @@ public class Messages extends NLS
     public static String LabelMissingQuotes;
     public static String LabelMissingQuotes_Decsription;
     public static String LabelMobileApp;
+    public static String LabelMonthlyPNTransfers;
+    public static String LabelMonthsAgo;
     public static String LabelMore;
     public static String LabelNamePlusCopy;
     public static String LabelNet;
@@ -850,7 +855,6 @@ public class Messages extends NLS
     public static String LabelRatio;
     public static String LabelRefresh;
     public static String LabelRemoveDividends;
-    public static String LabelMonthlyPNTransfers;
     public static String LabelRemoveLogo;
     public static String LabelReportingAddPeriod;
     public static String LabelReportingDialogDay;
@@ -897,6 +901,7 @@ public class Messages extends NLS
     public static String LabelSettings;
     public static String LabelSharpeRatio;
     public static String LabelShowAverage;
+    public static String LabelShowEventsStarting;
     public static String LabelShowHeadline;
     public static String LabelShowOnlyOneYear;
     public static String LabelShowRawResponse;
@@ -965,6 +970,7 @@ public class Messages extends NLS
     public static String LabelViewTreeMap;
     public static String LabelVolatility;
     public static String LabelWatchlist;
+    public static String LabelWeeksAgo;
     public static String LabelWithoutClassification;
     public static String LabelWithQualifier;
     public static String LabelXDays;
@@ -1449,6 +1455,9 @@ public class Messages extends NLS
     public static String TransactionFilterTransfers;
     public static String Url;
     public static String MsgWarningWayland;
+    public static String ValueColorSchemeAsia;
+    public static String ValueColorSchemeBlueOrange;
+    public static String ValueColorSchemeStandard;
     public static String WatchlistDelete;
     public static String WatchlistEditDialog;
     public static String WatchlistEditDialogMsg;
