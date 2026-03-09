@@ -217,11 +217,11 @@ public class PerformanceView extends AbstractHistoricView
         createCalculationItem(folder, Messages.PerformanceTabCalculation);
 
         snapshotStart = createStatementOfAssetsItem(folder, Messages.PerformanceTabAssetsAtStart);
-        snapshotStart.getTableViewer().addSelectionChangedListener(
+        snapshotStart.getTreeViewer().addSelectionChangedListener(
                         e -> setInformationPaneInput(e.getStructuredSelection().getFirstElement()));
 
         snapshotEnd = createStatementOfAssetsItem(folder, Messages.PerformanceTabAssetsAtEnd);
-        snapshotEnd.getTableViewer().addSelectionChangedListener(
+        snapshotEnd.getTreeViewer().addSelectionChangedListener(
                         e -> setInformationPaneInput(e.getStructuredSelection().getFirstElement()));
 
         earnings = createTransactionViewer(folder, Messages.PerformanceTabEarnings);
@@ -1003,11 +1003,11 @@ public class PerformanceView extends AbstractHistoricView
 
             manager.add(new SimpleAction(
                             MessageFormat.format(Messages.LabelExport, Messages.PerformanceTabAssetsAtStart),
-                            a -> new TableViewerCSVExporter(snapshotStart.getTableViewer())
+                            a -> new TreeViewerCSVExporter(snapshotStart.getTreeViewer()).withFlatTable()
                                             .export(Messages.PerformanceTabAssetsAtStart + fileSuffix)));
 
             manager.add(new SimpleAction(MessageFormat.format(Messages.LabelExport, Messages.PerformanceTabAssetsAtEnd),
-                            a -> new TableViewerCSVExporter(snapshotEnd.getTableViewer())
+                            a -> new TreeViewerCSVExporter(snapshotEnd.getTreeViewer()).withFlatTable()
                                             .export(Messages.PerformanceTabAssetsAtEnd + fileSuffix)));
 
             manager.add(new SimpleAction(MessageFormat.format(Messages.LabelExport, Messages.PerformanceTabEarnings),

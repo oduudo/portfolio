@@ -3053,19 +3053,18 @@ public class SBrokerPDFExtractorTest
 
         var results = extractor.extract(PDFInputFile.loadTestCase(getClass(), "GiroKontoauszug04.txt"), errors);
 
-        // assertThat(errors, empty());
-        // assertThat(countSecurities(results), is(0L));
-        // assertThat(countBuySell(results), is(0L));
-        // assertThat(countAccountTransactions(results), is(12L));
-        // assertThat(results.size(), is(12));
-        // new AssertImportActions().check(results, "EUR");
+        assertThat(errors, empty());
+        assertThat(countSecurities(results), is(0L));
+        assertThat(countBuySell(results), is(0L));
+        assertThat(countAccountTransactions(results), is(12L));
+        assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
+        assertThat(results.size(), is(12));
+        new AssertImportActions().check(results, "EUR");
 
         // check transaction
-        // get transactions
         var iter = results.stream().filter(TransactionItem.class::isInstance).iterator();
-        // assertThat(results.stream().filter(TransactionItem.class::isInstance).count(),
-        // is(12L));
-
         var item = iter.next();
 
         // assert transaction

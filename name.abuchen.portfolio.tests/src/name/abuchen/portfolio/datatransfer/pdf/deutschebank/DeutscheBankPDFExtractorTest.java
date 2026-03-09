@@ -20,7 +20,9 @@ import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.purchase;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.removal;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.sale;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.security;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.skippedItem;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.taxRefund;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.taxes;
 import static name.abuchen.portfolio.datatransfer.ExtractorTestUtilities.countAccountTransactions;
 import static name.abuchen.portfolio.datatransfer.ExtractorTestUtilities.countAccountTransfers;
 import static name.abuchen.portfolio.datatransfer.ExtractorTestUtilities.countBuySell;
@@ -751,13 +753,10 @@ public class DeutscheBankPDFExtractorTest
         new AssertImportActions().check(results, "EUR");
 
         // check security
-        var security = results.stream().filter(SecurityItem.class::isInstance).findFirst()
-                        .orElseThrow(IllegalArgumentException::new).getSecurity();
-        assertThat(security.getIsin(), is("LU0392494562"));
-        assertThat(security.getWkn(), is("ETF110"));
-        assertNull(security.getTickerSymbol());
-        assertThat(security.getName(), is("COMSTAGE-MSCI WORLD TRN U.ETF INH.ANT.I O.N. 1/1"));
-        assertThat(security.getCurrencyCode(), is("EUR"));
+        assertThat(results, hasItem(security( //
+                        hasIsin("LU0392494562"), hasWkn("ETF110"), hasTicker(null), //
+                        hasName("COMSTAGE-MSCI WORLD TRN U.ETF INH.ANT.I O.N."), //
+                        hasCurrencyCode("EUR"))));
 
         // check buy sell transaction
         var entry = (BuySellEntry) results.stream().filter(BuySellEntryItem.class::isInstance).findFirst()
@@ -801,13 +800,10 @@ public class DeutscheBankPDFExtractorTest
         new AssertImportActions().check(results, "EUR");
 
         // check security
-        var security = results.stream().filter(SecurityItem.class::isInstance).findFirst()
-                        .orElseThrow(IllegalArgumentException::new).getSecurity();
-        assertThat(security.getIsin(), is("IE00BK1PV551"));
-        assertThat(security.getWkn(), is("A1XEY2"));
-        assertNull(security.getTickerSymbol());
-        assertThat(security.getName(), is("X(IE)-MSCI WORLD 1D FUNDS 1/1"));
-        assertThat(security.getCurrencyCode(), is("EUR"));
+        assertThat(results, hasItem(security( //
+                        hasIsin("IE00BK1PV551"), hasWkn("A1XEY2"), hasTicker(null), //
+                        hasName("X(IE)-MSCI WORLD 1D FUNDS"), //
+                        hasCurrencyCode("EUR"))));
 
         // check buy sell transaction
         var entry = (BuySellEntry) results.stream().filter(BuySellEntryItem.class::isInstance).findFirst()
@@ -851,13 +847,10 @@ public class DeutscheBankPDFExtractorTest
         new AssertImportActions().check(results, "EUR");
 
         // check security
-        var security = results.stream().filter(SecurityItem.class::isInstance).findFirst()
-                        .orElseThrow(IllegalArgumentException::new).getSecurity();
-        assertThat(security.getIsin(), is("IE00BL25JL35"));
-        assertThat(security.getWkn(), is("A1103D"));
-        assertNull(security.getTickerSymbol());
-        assertThat(security.getName(), is("X(IE)-MSCI WRLD QUAL.1CDL FUNDS 1/1"));
-        assertThat(security.getCurrencyCode(), is("EUR"));
+        assertThat(results, hasItem(security( //
+                        hasIsin("IE00BL25JL35"), hasWkn("A1103D"), hasTicker(null), //
+                        hasName("X(IE)-MSCI WRLD QUAL.1CDL FUNDS"), //
+                        hasCurrencyCode("EUR"))));
 
         // check buy sell transaction
         var entry = (BuySellEntry) results.stream().filter(BuySellEntryItem.class::isInstance).findFirst()
@@ -901,13 +894,10 @@ public class DeutscheBankPDFExtractorTest
         new AssertImportActions().check(results, "EUR");
 
         // check security
-        var security = results.stream().filter(SecurityItem.class::isInstance).findFirst()
-                        .orElseThrow(IllegalArgumentException::new).getSecurity();
-        assertThat(security.getIsin(), is("IE00BTJRMP35"));
-        assertThat(security.getWkn(), is("A12GVR"));
-        assertNull(security.getTickerSymbol());
-        assertThat(security.getName(), is("X(IE)-MSCI EM.MKTS 1CDL FUNDS 1/1"));
-        assertThat(security.getCurrencyCode(), is("EUR"));
+        assertThat(results, hasItem(security( //
+                        hasIsin("IE00BTJRMP35"), hasWkn("A12GVR"), hasTicker(null), //
+                        hasName("X(IE)-MSCI EM.MKTS 1CDL FUNDS"), //
+                        hasCurrencyCode("EUR"))));
 
         // check buy sell transaction
         var entry = (BuySellEntry) results.stream().filter(BuySellEntryItem.class::isInstance).findFirst()
@@ -953,7 +943,7 @@ public class DeutscheBankPDFExtractorTest
         // check security
         assertThat(results, hasItem(security( //
                         hasIsin("LU0321464652"), hasWkn("DBX0A1"), hasTicker(null), //
-                        hasName("XTRACKERS II GBP OVER.RATE SW.INH.ANT.1D ON 1/1"), //
+                        hasName("XTRACKERS II GBP OVER.RATE SW.INH.ANT.1D ON"), //
                         hasCurrencyCode("EUR"))));
 
         // check buy sell transaction
@@ -987,7 +977,7 @@ public class DeutscheBankPDFExtractorTest
         // check security
         assertThat(results, hasItem(security( //
                         hasIsin("DE0008476524"), hasWkn("847652"), hasTicker(null), //
-                        hasName("DWS VERMÖGENSBG.FONDS I INHABER-ANTEILE LD 1/1"), //
+                        hasName("DWS VERMÖGENSBG.FONDS I INHABER-ANTEILE LD"), //
                         hasCurrencyCode("EUR"))));
 
         // check buy sell transaction
@@ -1021,7 +1011,7 @@ public class DeutscheBankPDFExtractorTest
         // check security
         assertThat(results, hasItem(security( //
                         hasIsin("DE0008476524"), hasWkn("847652"), hasTicker(null), //
-                        hasName("DWS VERMÖGENSBG.FONDS I INHABER-ANTEILE LD 1/1"), //
+                        hasName("DWS VERMÖGENSBG.FONDS I INHABER-ANTEILE LD"), //
                         hasCurrencyCode("EUR"))));
 
         // check buy sell transaction
@@ -1283,6 +1273,40 @@ public class DeutscheBankPDFExtractorTest
                         is(Money.of("EUR", Values.Amount.factorize(0.00))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.FEE),
                         is(Money.of("EUR", Values.Amount.factorize(58.90 + 2.00 + 1.33))));
+    }
+
+    @Test
+    public void testWertpapierVerkauf05()
+    {
+        var extractor = new DeutscheBankPDFExtractor(new Client());
+
+        List<Exception> errors = new ArrayList<>();
+
+        var results = extractor.extract(PDFInputFile.loadTestCase(getClass(), "Verkauf05.txt"), errors);
+
+        assertThat(errors, empty());
+        assertThat(countSecurities(results), is(1L));
+        assertThat(countBuySell(results), is(1L));
+        assertThat(countAccountTransactions(results), is(0L));
+        assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
+        assertThat(results.size(), is(2));
+        new AssertImportActions().check(results, "EUR");
+
+        // check security
+        assertThat(results, hasItem(security( //
+                        hasIsin("HK0992009065"), hasWkn("894983"), hasTicker(null), //
+                        hasName("LENOVO GROUP LTD.REGISTERED SHARES O.N."), //
+                        hasCurrencyCode("EUR"))));
+
+        // check buy sell transaction
+        assertThat(results, hasItem(sale( //
+                        hasDate("2026-02-24T08:02:00"), hasShares(8000), //
+                        hasSource("Verkauf05.txt"), //
+                        hasNote("Belegnummer 6978580640 / 890153444"), //
+                        hasAmount("EUR", 7185.60), hasGrossValue("EUR", 8200.00), //
+                        hasTaxes("EUR", 933.16 + 51.32), hasFees("EUR", 20.50 + 4.50 + 4.92))));
     }
 
     @Test
@@ -3036,5 +3060,74 @@ public class DeutscheBankPDFExtractorTest
         // assert transaction
         assertThat(results, hasItem(taxRefund(hasDate("2025-08-25"), hasAmount("EUR", 34.30), //
                         hasSource("GiroKontoauszug11.txt"), hasNote("Steuererstattung"))));
+    }
+
+    @Test
+    public void testVorabpauschale01()
+    {
+        var extractor = new DeutscheBankPDFExtractor(new Client());
+
+        List<Exception> errors = new ArrayList<>();
+
+        var results = extractor.extract(PDFInputFile.loadTestCase(getClass(), "Vorabpauschale01.txt"), errors);
+
+        assertThat(errors, empty());
+        assertThat(countSecurities(results), is(1L));
+        assertThat(countBuySell(results), is(0L));
+        assertThat(countAccountTransactions(results), is(1L));
+        assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(0L));
+        assertThat(results.size(), is(2));
+        new AssertImportActions().check(results, "EUR");
+
+        // check security
+        assertThat(results, hasItem(security( //
+                        hasIsin("IE00B4X9L533"), hasWkn("A1C9KK"), hasTicker(null), //
+                        hasName("HSBC MSCI WORLD UCITS ETF FUNDS"), //
+                        hasCurrencyCode("EUR"))));
+
+        // check taxes transaction
+        assertThat(results, hasItem(taxes( //
+                        hasDate("2026-01-02T00:00"), hasShares(300), //
+                        hasSource("Vorabpauschale01.txt"), //
+                        hasNote(null), //
+                        hasAmount("EUR", 8.87), hasGrossValue("EUR", 8.87), //
+                        hasTaxes("EUR", 0.00), hasFees("EUR", 0.00))));
+    }
+
+    @Test
+    public void testVorabpauschale02()
+    {
+        var extractor = new DeutscheBankPDFExtractor(new Client());
+
+        List<Exception> errors = new ArrayList<>();
+
+        var results = extractor.extract(PDFInputFile.loadTestCase(getClass(), "Vorabpauschale02.txt"), errors);
+
+        assertThat(errors, empty());
+        assertThat(countSecurities(results), is(1L));
+        assertThat(countBuySell(results), is(0L));
+        assertThat(countAccountTransactions(results), is(0L));
+        assertThat(countAccountTransfers(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(1L));
+        assertThat(results.size(), is(2));
+        new AssertImportActions().check(results, "EUR");
+
+        // check security
+        assertThat(results, hasItem(security( //
+                        hasIsin("IE00B0M62X26"), hasWkn("A0HGV1"), hasTicker(null), //
+                        hasName("ISHS EO IN.LI.GO.BD U.ETF(D)RG.SH.O.N."), //
+                        hasCurrencyCode("EUR"))));
+
+        // check skipped item
+        assertThat(results, hasItem(skippedItem( //
+                        Messages.MsgErrorTransactionTypeNotSupportedOrRequired, taxes( //
+                                        hasDate("2026-01-15"), hasShares(120), //
+                                        hasSource("Vorabpauschale02.txt"), //
+                                        hasNote(null), //
+                                        hasAmount("EUR", 0.00), hasGrossValue("EUR", 0.00), //
+                                        hasTaxes("EUR", 0.00), hasFees("EUR", 0.00)))));
     }
 }

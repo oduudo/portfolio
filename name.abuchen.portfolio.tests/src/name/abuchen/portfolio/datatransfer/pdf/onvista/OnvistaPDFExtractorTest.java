@@ -27,6 +27,7 @@ import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.purchase;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.removal;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.sale;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.security;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.skippedItem;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.taxes;
 import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.withFailureMessage;
 import static name.abuchen.portfolio.datatransfer.ExtractorTestUtilities.countAccountTransactions;
@@ -38,7 +39,6 @@ import static name.abuchen.portfolio.datatransfer.ExtractorTestUtilities.countSk
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertNull;
 
@@ -3105,7 +3105,7 @@ public class OnvistaPDFExtractorTest
         assertThat(transaction.getType(), is(AccountTransaction.Type.TAXES));
 
         assertThat(transaction.getDateTime(), is(LocalDateTime.parse("2017-10-20T00:00")));
-        assertThat(transaction.getExDate(), is(nullValue()));
+        assertThat(transaction.getExDate(), is(LocalDateTime.parse("2017-10-06T00:00")));
         assertThat(transaction.getShares(), is(Values.Share.factorize(0.4512)));
         assertThat(transaction.getSource(), is("Dividende15.txt"));
         assertThat(transaction.getNote(), is("Abrechnungs-Nr. 12345678 | Ertrag für 2017"));
@@ -3144,7 +3144,7 @@ public class OnvistaPDFExtractorTest
         assertThat(security.getName(), is("Garmin Ltd. Namens-Aktien SF 0,10"));
         assertThat(security.getCurrencyCode(), is("USD"));
 
-        // check dividends tax transaction
+        // check dividends transaction
         var transaction = (AccountTransaction) results.stream().filter(TransactionItem.class::isInstance).findFirst()
                         .orElseThrow(IllegalArgumentException::new).getSubject();
 
@@ -3241,8 +3241,8 @@ public class OnvistaPDFExtractorTest
 
         // check dividends transaction
         assertThat(results, hasItem(dividend( //
-                        hasDate("2019-09-09"), hasShares(60), //
-                        hasExDate("2019-08-30"), //
+                        hasDate("2019-09-09"), hasExDate("2019-08-30"), //
+                        hasShares(60.00), //
                         hasSource("Dividende17.txt"), //
                         hasNote("Abrechnungs-Nr. 26128781"), //
                         hasAmount("EUR", 7.65), hasGrossValue("EUR", 15.73), //
@@ -3277,18 +3277,12 @@ public class OnvistaPDFExtractorTest
 
         // check dividends transaction
         assertThat(results, hasItem(dividend( //
-                        hasDate("2019-09-09"), hasShares(60), //
-                        hasExDate("2019-08-30"), //
-                        hasSource("Dividende17.txt"), hasNote("Abrechnungs-Nr. 26128781"), //
+                        hasDate("2019-09-09"), hasExDate("2019-08-30"), //
+                        hasShares(60.00), //
+                        hasSource("Dividende17.txt"), //
+                        hasNote("Abrechnungs-Nr. 26128781"), //
                         hasAmount("EUR", 7.65), hasGrossValue("EUR", 15.73), //
-                        hasTaxes("EUR", (39.00 / 9.9148) + 3.93 + 0.22), hasFees("EUR", 0.00), //
-                        check(tx -> {
-                            var c = new CheckCurrenciesAction();
-                            var account = new Account();
-                            account.setCurrencyCode("EUR");
-                            var s = c.process((AccountTransaction) tx, account);
-                            assertThat(s, is(Status.OK_STATUS));
-                        }))));
+                        hasTaxes("EUR", (39.00 / 9.9148) + 3.93 + 0.22), hasFees("EUR", 0.00))));
     }
 
     @Test
@@ -3318,12 +3312,23 @@ public class OnvistaPDFExtractorTest
 
         // check dividends transaction
         assertThat(results, hasItem(dividend( //
-                        hasDate("2015-12-17T00:00"), hasShares(156.729), //
-                        hasExDate("2015-12-15"), //
+                        hasDate("2015-12-17T00:00"), hasExDate("2015-12-15"), //
+                        hasShares(156.729), //
                         hasSource("Dividende18.txt"), //
                         hasNote("Abrechnungs-Nr. 70187215 | Ertrag für 2014/15"), //
                         hasAmount("EUR", 7.68), hasGrossValue("EUR", 11.84), //
                         hasTaxes("EUR", 4.16), hasFees("EUR", 0.00))));
+
+        // check skipped transaction
+        assertThat(results, hasItem(skippedItem( //
+                        Messages.MsgErrorTransactionTypeNotSupportedOrRequired, //
+                        dividend( //
+                                        hasDate("2015-12-17T00:00"), hasExDate("2015-12-15"), //
+                                        hasShares(156.729), //
+                                        hasSource("Dividende18.txt"), //
+                                        hasNote("Ausführungs-Nr. 33217061"), //
+                                        hasAmount("EUR", 3.01), hasGrossValue("EUR", 3.01), //
+                                        hasTaxes("EUR", 0.00), hasFees("EUR", 0.00)))));
     }
 
     @Test
@@ -3675,12 +3680,10 @@ public class OnvistaPDFExtractorTest
         assertThat(errors, empty());
         assertThat(countSecurities(results), is(2L));
         assertThat(countBuySell(results), is(0L));
-        assertThat(countAccountTransactions(results), is(2L));
+        assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
-        assertThat(countItemsWithFailureMessage(results), is(2L));
-        assertThat(countSkippedItems(results), is(0L));
+
         assertThat(results.size(), is(4));
-        new AssertImportActions().check(results, "EUR");
 
         // check security
         var security = results.stream().filter(SecurityItem.class::isInstance).findFirst()
@@ -3691,29 +3694,15 @@ public class OnvistaPDFExtractorTest
         assertThat(security.getName(), is("iShs Core MSCI EM IMI U.ETF Registered Shares o.N."));
         assertThat(security.getCurrencyCode(), is("EUR"));
 
-        // check cancellation (Storno) transaction
-        var cancellation = (TransactionItem) results.stream() //
-                        .filter(i -> i.isFailure()) //
-                        .filter(TransactionItem.class::isInstance) //
-                        .findFirst().orElseThrow(IllegalArgumentException::new);
-
-        assertThat(((AccountTransaction) cancellation.getSubject()).getType(), is(AccountTransaction.Type.TAXES));
-        assertThat(cancellation.getFailureMessage(), is(Messages.MsgErrorTransactionTypeNotSupportedOrRequired));
-
-        assertThat(((Transaction) cancellation.getSubject()).getDateTime(),
-                        is(LocalDateTime.parse("2020-01-02T00:00")));
-        assertThat(((Transaction) cancellation.getSubject()).getShares(), is(Values.Share.factorize(100)));
-        assertThat(((Transaction) cancellation.getSubject()).getSource(), is("Vorabpauschale02.txt"));
-        assertThat(((Transaction) cancellation.getSubject()).getNote(), is("Ausführungs-Nr. 82128903"));
-
-        assertThat(((Transaction) cancellation.getSubject()).getMonetaryAmount(),
-                        is(Money.of("EUR", Values.Amount.factorize(0.00))));
-        assertThat(((Transaction) cancellation.getSubject()).getGrossValue(),
-                        is(Money.of("EUR", Values.Amount.factorize(0.00))));
-        assertThat(((Transaction) cancellation.getSubject()).getUnitSum(Unit.Type.TAX),
-                        is(Money.of("EUR", Values.Amount.factorize(0.00))));
-        assertThat(((Transaction) cancellation.getSubject()).getUnitSum(Unit.Type.FEE),
-                        is(Money.of("EUR", Values.Amount.factorize(0.00))));
+        // check cancellation (Amount = 0,00) transaction
+        assertThat(results, hasItem(skippedItem( //
+                        Messages.MsgErrorTransactionTypeNotSupportedOrRequired, //
+                        taxes( //
+                                        hasDate("2020-01-02"), hasShares(100.00), //
+                                        hasSource("Vorabpauschale02.txt"), //
+                                        hasNote("Ausführungs-Nr. 82128903"), //
+                                        hasAmount("EUR", 0.00), hasGrossValue("EUR", 0.00), //
+                                        hasTaxes("EUR", 0.00), hasFees("EUR", 0.00)))));
     }
 
     @Test
@@ -3728,12 +3717,10 @@ public class OnvistaPDFExtractorTest
         assertThat(errors, empty());
         assertThat(countSecurities(results), is(2L));
         assertThat(countBuySell(results), is(0L));
-        assertThat(countAccountTransactions(results), is(2L));
+        assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
-        assertThat(countItemsWithFailureMessage(results), is(2L));
-        assertThat(countSkippedItems(results), is(0L));
+
         assertThat(results.size(), is(4));
-        new AssertImportActions().check(results, "EUR");
 
         // check security
         assertThat(results, hasItem(security( //
@@ -3747,20 +3734,22 @@ public class OnvistaPDFExtractorTest
                         hasCurrencyCode("EUR"))));
 
         // check cancellation (Amount = 0,00) transaction
-        assertThat(results, hasItem(withFailureMessage( //
+        assertThat(results, hasItem(skippedItem( //
                         Messages.MsgErrorTransactionTypeNotSupportedOrRequired, //
                         taxes( //
                                         hasDate("2021-01-04"), hasShares(0.1), //
-                                        hasSource("Vorabpauschale03.txt"), hasNote("Ausführungs-Nr. 66023908"), //
+                                        hasSource("Vorabpauschale03.txt"), //
+                                        hasNote("Ausführungs-Nr. 66023908"), //
                                         hasAmount("EUR", 0.00), hasGrossValue("EUR", 0.00), //
                                         hasTaxes("EUR", 0.00), hasFees("EUR", 0.00)))));
 
         // check cancellation (Amount = 0,00) transaction
-        assertThat(results, hasItem(withFailureMessage( //
+        assertThat(results, hasItem(skippedItem( //
                         Messages.MsgErrorTransactionTypeNotSupportedOrRequired, //
                         taxes( //
                                         hasDate("2021-01-04"), hasShares(0.1), //
-                                        hasSource("Vorabpauschale03.txt"), hasNote("Ausführungs-Nr. 55108371"), //
+                                        hasSource("Vorabpauschale03.txt"), //
+                                        hasNote("Ausführungs-Nr. 55108371"), //
                                         hasAmount("EUR", 0.00), hasGrossValue("EUR", 0.00), //
                                         hasTaxes("EUR", 0.00), hasFees("EUR", 0.00)))));
     }
@@ -3777,12 +3766,11 @@ public class OnvistaPDFExtractorTest
         assertThat(errors, empty());
         assertThat(countSecurities(results), is(1L));
         assertThat(countBuySell(results), is(0L));
-        assertThat(countAccountTransactions(results), is(1L));
+        assertThat(countAccountTransactions(results), is(0L));
         assertThat(countAccountTransfers(results), is(0L));
-        assertThat(countItemsWithFailureMessage(results), is(1L));
-        assertThat(countSkippedItems(results), is(0L));
+        assertThat(countItemsWithFailureMessage(results), is(0L));
+        assertThat(countSkippedItems(results), is(1L));
         assertThat(results.size(), is(2));
-        new AssertImportActions().check(results, "EUR");
 
         // check security
         assertThat(results, hasItem(security( //
@@ -3791,11 +3779,12 @@ public class OnvistaPDFExtractorTest
                         hasCurrencyCode("EUR"))));
 
         // check cancellation (Amount = 0,00) transaction
-        assertThat(results, hasItem(withFailureMessage( //
+        assertThat(results, hasItem(skippedItem( //
                         Messages.MsgErrorTransactionTypeNotSupportedOrRequired, //
                         taxes( //
                                         hasDate("2020-01-02"), hasShares(171.6149), //
-                                        hasSource("Vorabpauschale04.txt"), hasNote("Ausführungs-Nr. 66023908"), //
+                                        hasSource("Vorabpauschale04.txt"), //
+                                        hasNote("Ausführungs-Nr. 66023908"), //
                                         hasAmount("EUR", 0.00), hasGrossValue("EUR", 0.00), //
                                         hasTaxes("EUR", 0.00), hasFees("EUR", 0.00)))));
     }

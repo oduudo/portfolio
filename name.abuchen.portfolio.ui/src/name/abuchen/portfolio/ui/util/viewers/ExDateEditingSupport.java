@@ -31,7 +31,7 @@ public class ExDateEditingSupport extends ColumnEditingSupport
     public boolean canEdit(Object element)
     {
         var tx = Adaptor.adapt(AccountTransaction.class, element);
-        return tx != null && tx.getType() == AccountTransaction.Type.DIVIDENDS;
+        return tx != null && tx.getSecurity() != null;
     }
 
     @Override
