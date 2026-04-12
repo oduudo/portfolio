@@ -235,6 +235,7 @@ public class Messages extends NLS
     public static String ColumnIssue;
     public static String ColumnLabel;
     public static String ColumnLastDate;
+    public static String ColumnLastTransactionDate;
     public static String ColumnLastDividendPayment;
     public static String ColumnLastDividendPayment_MenuLabel;
     public static String ColumnLatest;
@@ -714,6 +715,15 @@ public class Messages extends NLS
     public static String LabelExport;
     public static String LabelFees;
     public static String LabelFeesAccumulated;
+    public static String LabelFIREAchieved;
+    public static String LabelFIREClickToSet;
+    public static String LabelFIRECurrentNetWorth;
+    public static String LabelFIREMonthlySavings;
+    public static String LabelFIRENumber;
+    public static String LabelFIREReturns;
+    public static String LabelFIRETargetDate;
+    public static String LabelFIRETimeToFIRE;
+    public static String LabelFIREWidget;
     public static String LabelFirstDayOfWeek;
     public static String LabelFontSize;
     public static String LabelFormatJSON;
@@ -928,6 +938,9 @@ public class Messages extends NLS
     public static String LabelTotalsAtTheBottom;
     public static String LabelTotalsAtTheTop;
     public static String LabelTotalSum;
+    public static String LabelTopAndBottomCount;
+    public static String LabelTopContributorsReturn;
+    public static String LabelTopContributorsValue;
     public static String LabelTotalValuePercent;
     public static String LabelTrades;
     public static String LabelTradesBasicStatistics;
@@ -1110,6 +1123,8 @@ public class Messages extends NLS
     public static String MsgErrorAccountNotExist;
     public static String MsgErrorConvertedAmount;
     public static String MsgErrorConvertToBuySellCurrencyMismatch;
+    public static String MsgBackfillExDatesNoCandidates;
+    public static String MsgBackfillExDatesUpdated;
     public static String MsgErrorDividendsYearBetween1900AndNow;
     public static String MsgErrorExchangeMissing;
     public static String MsgErrorMinimumHeightRequired;
@@ -1460,6 +1475,7 @@ public class Messages extends NLS
     public static String ValueColorSchemeAsia;
     public static String ValueColorSchemeBlueOrange;
     public static String ValueColorSchemeStandard;
+    public static String ValueColorSchemeVividContrast;
     public static String WatchlistDelete;
     public static String WatchlistEditDialog;
     public static String WatchlistEditDialogMsg;
