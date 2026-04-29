@@ -1307,6 +1307,8 @@ public class Messages extends NLS
     public static String PrefUpdateQuotesAfterFileOpen;
     public static String PrefUpdateQuotesPeriodically;
     public static String PrefUpdateSite;
+    public static String PrefUpdateSiteBetaChannel;
+    public static String PrefUpdateSiteStableChannel;
     public static String PresetsPrefPageDescription;
     public static String PresetsPrefPageNow;
     public static String PresetsPrefPageStartOfDay;
@@ -1440,6 +1442,7 @@ public class Messages extends NLS
     public static String TooltipAverageHoldingPeriod;
     public static String TooltipCurrentDrawdown;
     public static String TooltipDateOfExchangeRate;
+    public static String TooltipFIRENumber;
     public static String TooltipHintPressAlt;
     public static String TooltipMaxDrawdown;
     public static String TooltipMaxDrawdownDuration;
