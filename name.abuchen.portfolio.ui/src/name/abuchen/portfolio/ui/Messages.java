@@ -652,6 +652,7 @@ public class Messages extends NLS
     public static String LabelColonSeparated;
     public static String LabelColorBy;
     public static String LabelColorSchema;
+    public static String LabelColorValue;
     public static String LabelColorValueScheme;
     public static String LabelColumns;
     public static String LabelColumnsInReverseOrder;
