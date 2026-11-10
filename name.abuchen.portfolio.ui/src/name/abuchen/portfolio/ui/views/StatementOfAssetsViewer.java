@@ -110,6 +110,7 @@ import name.abuchen.portfolio.ui.util.viewers.CopyPasteSupport;
 import name.abuchen.portfolio.ui.util.viewers.DateLabelProvider;
 import name.abuchen.portfolio.ui.util.viewers.OptionLabelProvider;
 import name.abuchen.portfolio.ui.util.viewers.ReportingPeriodColumnOptions;
+import name.abuchen.portfolio.ui.util.viewers.SafeTableColumnLayout;
 import name.abuchen.portfolio.ui.util.viewers.SharesLabelProvider;
 import name.abuchen.portfolio.ui.util.viewers.ShowHideColumnHelper;
 import name.abuchen.portfolio.ui.util.viewers.StringEditingSupport;
@@ -398,7 +399,7 @@ public class StatementOfAssetsViewer
     private Control createColumns(Composite parent, boolean isConfigurable) // NOSONAR
     {
         Composite container = new Composite(parent, SWT.NONE);
-        TableColumnLayout layout = new TableColumnLayout();
+        TableColumnLayout layout = new SafeTableColumnLayout();
         container.setLayout(layout);
 
         assets = new TableViewer(container, SWT.FULL_SELECTION | SWT.MULTI);
@@ -1027,7 +1028,7 @@ public class StatementOfAssetsViewer
 
     private void addAttributeColumns()
     {
-        AttributeColumn.createFor(client, Security.class) //
+        AttributeColumn.createForSecuritiesAndAccounts(client) //
                         .forEach(column -> {
                             if (column.getSorter() != null)
                                 column.getSorter().wrap(ElementComparator::new);
@@ -1560,9 +1561,13 @@ public class StatementOfAssetsViewer
         @Override
         public <T> T adapt(Class<T> type) // NOSONAR
         {
-            if (type == Security.class || type == Attributable.class)
+            if (type == Security.class)
             {
                 return type.cast(getSecurity());
+            }
+            else if (type == Attributable.class)
+            {
+                return type.cast(isAccount() ? getAccount() : getSecurity());
             }
             else if (type == Named.class || type == Annotated.class)
             {
